@@ -14,7 +14,7 @@ Colores = {
     "Azul": (10, 10, 245, 255),  
     "Verde": (30, 154, 94, 255),
     "Siena": (166, 66, 46, 255),
-    "Morado": (177, 156, 217, 255),
+    "Púrpura": (177, 156, 217, 255),
     "Gris": (64, 64, 79, 255),
     "Negro": (0, 0, 0, 255)
 }
@@ -66,7 +66,7 @@ def DibujaMatriz(): #Funcion que muestra (DE MOMENTO) en consola la matriz
         print(" ".join(map(str, row)))
 
 def DibujaASCII(): #Funcion que muestra (DE MOMENTO) en consola el ascii
-    ascii_map = {0: ' ', 1: '#', 2: '@', 3: '$', 4: '%'}
+    ascii_map = {0: ' ', 1: '.', 2: ':', 3: '-', 4: '%', 5: "¡", 6: "&", 7: "$", 8: "%", 9: "@"}
     matrix = [[ValoresColores[grid[y][x]] for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print("".join(ascii_map[val] for val in row))
@@ -107,4 +107,3 @@ dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
 dpg.destroy_context()
-
