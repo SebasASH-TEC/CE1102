@@ -107,3 +107,6 @@ dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
 dpg.destroy_context()
+
+#SEBAS WAPO
+#ARRIBA EL SAPRISSA
