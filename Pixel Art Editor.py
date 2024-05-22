@@ -108,5 +108,6 @@ dpg.show_viewport()
 dpg.start_dearpygui()
 dpg.destroy_context()
 
-#SEBAS WAPO
-#ARRIBA EL SAPRISSA
+#VIVA LA LIBERTAD CARAJ0
+#CARTAGO CAMPION
+#OLAA MUNDO
