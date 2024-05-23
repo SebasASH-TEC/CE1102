@@ -1,4 +1,7 @@
 import dearpygui.dearpygui as dpg
+import numpy as np
+from PIL import Image
+import os
 
 # Constantes
 WIDTH, HEIGHT = 50, 50
@@ -11,14 +14,15 @@ Colores = {
     "Plata": (192, 192, 192, 255),
     "Amarillo": (250, 250, 0, 255),
     "Rojo": (250, 20, 10, 255),
-    "Azul": (10, 10, 245, 255),  
+    "Azul": (10, 10, 245, 255),
     "Verde": (30, 154, 94, 255),
     "Siena": (166, 66, 46, 255),
     "Púrpura": (177, 156, 217, 255),
     "Gris": (64, 64, 79, 255),
     "Negro": (0, 0, 0, 255)
 }
- #Colores a representar, en RGB
+
+# Valores en la matriz de cada color
 ValoresColores = {
     (255, 255, 255, 255): 0,
     (192, 192, 192, 255): 1,
@@ -31,41 +35,41 @@ ValoresColores = {
     (64, 64, 79, 255): 8,
     (0, 0, 0, 255): 9
 }
- #Valores en la matriz de cada color 
+
+# Valores iniciales
 ColorActual = Colores["Negro"]
 grid = [[Colores["Blanco"] for _ in range(WIDTH)] for _ in range(HEIGHT)]
 
 def DibujaGrid():
-    dpg.delete_item("Dibujo", children_only=True)  # Elimina los dibujos anteriores, children_only=True determina que solo el dibujo se borra, no el area de dibujo
+    dpg.delete_item("Dibujo", children_only=True)
     for y in range(HEIGHT):
-        for x in range(WIDTH): #Los loops enlazados iteran sobre si mismos en el grid
+        for x in range(WIDTH):
             dpg.draw_rectangle([x * CELL_SIZE, y * CELL_SIZE],
                                [(x + 1) * CELL_SIZE, (y + 1) * CELL_SIZE],
                                color=(0, 0, 0, 255), fill=grid[y][x], parent="Dibujo")
-    # Dibuja verticales de arriba a abajo
     for x in range(WIDTH + 1):
         dpg.draw_line([x * CELL_SIZE, 0], [x * CELL_SIZE, HEIGHT * CELL_SIZE], color=(0, 0, 0, 255), thickness=1, parent="Dibujo")
-    for y in range(HEIGHT + 1): # Dsibuja horizontales de izquierda a derecha
+    for y in range(HEIGHT + 1):
         dpg.draw_line([0, y * CELL_SIZE], [WIDTH * CELL_SIZE, y * CELL_SIZE], color=(0, 0, 0, 255), thickness=1, parent="Dibujo")
 
-def ClickPosicion(sender, app_data, user_data): #dpg.get_mouse_pos(local=True) Verifica la posicion actual del mouse, retorna tupla con x,y
+def ClickPosicion(sender, app_data, user_data):
     mouse_pos = dpg.get_mouse_pos(local=True)
-    x = int(mouse_pos[0] // CELL_SIZE) #La posicion del mouse relativa con el grid
+    x = int(mouse_pos[0] // CELL_SIZE)
     y = int(mouse_pos[1] // CELL_SIZE)
-    if 0 <= x < WIDTH and 0 <= y < HEIGHT: #Chequea si esta en el grid
+    if 0 <= x < WIDTH and 0 <= y < HEIGHT:
         grid[y][x] = ColorActual
         DibujaGrid()
 
-def CambioAColorElegido(sender, app_data, user_data): #Actualiza el color actual por el seleccionado por el usuario
+def CambioAColorElegido(sender, app_data, user_data):
     global ColorActual
     ColorActual = Colores[user_data]
 
-def DibujaMatriz(): #Funcion que muestra (DE MOMENTO) en consola la matriz
+def DibujaMatriz():
     matrix = [[ValoresColores[grid[y][x]] for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print(" ".join(map(str, row)))
 
-def DibujaASCII(): #Funcion que muestra (DE MOMENTO) en consola el ascii
+def DibujaASCII():
     ascii_map = {0: ' ', 1: '.', 2: ':', 3: '-', 4: '%', 5: "¡", 6: "&", 7: "$", 8: "%", 9: "@"}
     matrix = [[ValoresColores[grid[y][x]] for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
@@ -83,6 +87,22 @@ def ZoomOut():
         CELL_SIZE -= 1
         DibujaGrid()
 
+def GuardaImagen():
+    pixel_data = []
+    for row in grid:
+        for color in row:
+            pixel_data.extend(color[:3])  # Toma solo los valores RGB
+    pixel_data = np.array(pixel_data, dtype=np.uint8)
+    pixel_data = np.reshape(pixel_data, (HEIGHT, WIDTH, 3))
+    image = Image.fromarray(pixel_data)
+    
+    
+    Folder = os.path.dirname(os.path.abspath(__file__))
+    Path = os.path.join(Folder, "PixelArt.png")
+    
+    image.save(Path)
+    print(f"Image saved at {Path}")
+
 dpg.create_context()
 
 with dpg.window(label="Pixel Art Editor"):
@@ -99,6 +119,7 @@ with dpg.window(label="Pixel Art Editor"):
 
     dpg.add_button(label="Mostrar Matrix", callback=DibujaMatriz)
     dpg.add_button(label="Mostrar ASCII", callback=DibujaASCII)
+    dpg.add_button(label="Guardar Imagen", callback=GuardaImagen)
 
 DibujaGrid()
 
