@@ -107,7 +107,3 @@ dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
 dpg.destroy_context()
-
-#VIVA LA LIBERTAD CARAJ0
-#CARTAGO CAMPION
-#OLAA MUNDO
