@@ -52,14 +52,14 @@ def DibujaGrid():
     for y in range(HEIGHT + 1):
         dpg.draw_line([0, y * CELL_SIZE], [WIDTH * CELL_SIZE, y * CELL_SIZE], color=(0, 0, 0, 255), thickness=1, parent="Dibujo")
 
-def ClickPosicion(sender, app_data, user_data):
+def ClickPosicion(sender, app_data, user_data): #Callbacks de DPG
     mouse_pos = dpg.get_mouse_pos(local=True)
     x = int(mouse_pos[0] // CELL_SIZE)
     y = int(mouse_pos[1] // CELL_SIZE)
     if 0 <= x < WIDTH and 0 <= y < HEIGHT:
         grid[y][x] = ColorActual
         DibujaGrid()
-
+        
 def CambioAColorElegido(sender, app_data, user_data):
     global ColorActual
     ColorActual = Colores[user_data]
@@ -70,10 +70,10 @@ def DibujaMatriz():
         print(" ".join(map(str, row)))
 
 def DibujaASCII():
-    ascii_map = {0: ' ', 1: '.', 2: ':', 3: '-', 4: '%', 5: "¡", 6: "&", 7: "$", 8: "%", 9: "@"}
+    DiccionarioASCII = {0: ' ', 1: '.', 2: ':', 3: '-', 4: '%', 5: "¡", 6: "&", 7: "$", 8: "%", 9: "@"}
     matrix = [[ValoresColores[grid[y][x]] for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
-        print("".join(ascii_map[val] for val in row))
+        print("".join(DiccionarioASCII[val] for val in row))
 
 def ZoomIn():
     global CELL_SIZE
@@ -88,7 +88,7 @@ def ZoomOut():
         DibujaGrid()
 
 def GuardaImagen():
-    pixel_data = []
+    pixel_data = [] #Lista vacia para almacenar los metadatos
     for row in grid:
         for color in row:
             pixel_data.extend(color[:3])  # Toma solo los valores RGB
@@ -97,10 +97,10 @@ def GuardaImagen():
     image = Image.fromarray(pixel_data)
     
     
-    Folder = os.path.dirname(os.path.abspath(__file__))
+    Folder = os.path.dirname(os.path.abspath(__file__)) #Folder para guardar la imagen
     Path = os.path.join(Folder, "PixelArt.png")
     
-    image.save(Path)
+    image.save(Path) #Guarda la imagen
     print(f"Image saved at {Path}")
 
 dpg.create_context()
