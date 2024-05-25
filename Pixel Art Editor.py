@@ -9,36 +9,63 @@ CELL_SIZE = 10
 MIN_CELL_SIZE = 5
 MAX_CELL_SIZE = 20
 
+class Color:
+    def __init__(self, name, r, g, b, a, number):
+        self.name = name
+        self.r = r
+        self.g = g
+        self.b = b
+        self.a = a
+        self.number = number
+
+    def get_rgba(self):
+        return (self.r, self.g, self.b, self.a)
+
+    def get_number(self):
+        return self.number
+
+# Instanciación de colores
+Blanco = Color("Blanco", 255, 255, 255, 255, 0)
+Plata = Color("Plata", 192, 192, 192, 255, 1)
+Amarillo = Color("Amarillo", 250, 250, 0, 255, 2)
+Rojo = Color("Rojo", 250, 20, 10, 255, 3)
+Azul = Color("Azul", 10, 10, 245, 255, 4)
+Verde = Color("Verde", 30, 154, 94, 255, 5)
+Siena = Color("Siena", 166, 66, 46, 255, 6)
+Purpura = Color("Purpura", 177, 156, 217, 255, 7)
+Gris = Color("Gris", 64, 64, 79, 255, 8)
+Negro = Color("Negro", 0, 0, 0, 255, 9)
+
+# Diccionarios para acceso rápido
 Colores = {
-    "Blanco": (255, 255, 255, 255),
-    "Plata": (192, 192, 192, 255),
-    "Amarillo": (250, 250, 0, 255),
-    "Rojo": (250, 20, 10, 255),
-    "Azul": (10, 10, 245, 255),
-    "Verde": (30, 154, 94, 255),
-    "Siena": (166, 66, 46, 255),
-    "Púrpura": (177, 156, 217, 255),
-    "Gris": (64, 64, 79, 255),
-    "Negro": (0, 0, 0, 255)
+    "Blanco": Blanco,
+    "Plata": Plata,
+    "Amarillo": Amarillo,
+    "Rojo": Rojo,
+    "Azul": Azul,
+    "Verde": Verde,
+    "Siena": Siena,
+    "Purpura": Purpura,
+    "Gris": Gris,
+    "Negro": Negro
 }
 
-# Valores en la matriz de cada color
 ValoresColores = {
-    (255, 255, 255, 255): 0,
-    (192, 192, 192, 255): 1,
-    (250, 250, 0, 255): 2,
-    (250, 20, 10, 255): 3,
-    (10, 10, 245, 255): 4,
-    (30, 154, 94, 255): 5,
-    (166, 66, 46, 255): 6,
-    (177, 156, 217, 255): 7,
-    (64, 64, 79, 255): 8,
-    (0, 0, 0, 255): 9
+    Blanco.get_rgba(): Blanco.get_number(),
+    Plata.get_rgba(): Plata.get_number(),
+    Amarillo.get_rgba(): Amarillo.get_number(),
+    Rojo.get_rgba(): Rojo.get_number(),
+    Azul.get_rgba(): Azul.get_number(),
+    Verde.get_rgba(): Verde.get_number(),
+    Siena.get_rgba(): Siena.get_number(),
+    Purpura.get_rgba(): Purpura.get_number(),
+    Gris.get_rgba(): Gris.get_number(),
+    Negro.get_rgba(): Negro.get_number()
 }
 
 # Valores iniciales
 ColorActual = Colores["Negro"]
-grid = [[Colores["Blanco"] for _ in range(WIDTH)] for _ in range(HEIGHT)]
+grid = [[Colores["Blanco"].get_rgba() for _ in range(WIDTH)] for _ in range(HEIGHT)]
 
 def DibujaGrid():
     dpg.delete_item("Dibujo", children_only=True)
@@ -52,12 +79,12 @@ def DibujaGrid():
     for y in range(HEIGHT + 1):
         dpg.draw_line([0, y * CELL_SIZE], [WIDTH * CELL_SIZE, y * CELL_SIZE], color=(0, 0, 0, 255), thickness=1, parent="Dibujo")
 
-def ClickPosicion(sender, app_data, user_data): #Callbacks de DPG
-    mouse_pos = dpg.get_mouse_pos(local=True)
+def ClickPosicion(sender, app_data, user_data):
+    mouse_pos = dpg.get_mouse_pos()
     x = int(mouse_pos[0] // CELL_SIZE)
     y = int(mouse_pos[1] // CELL_SIZE)
     if 0 <= x < WIDTH and 0 <= y < HEIGHT:
-        grid[y][x] = ColorActual
+        grid[y][x] = ColorActual.get_rgba()
         DibujaGrid()
         
 def CambioAColorElegido(sender, app_data, user_data):
@@ -88,7 +115,7 @@ def ZoomOut():
         DibujaGrid()
 
 def GuardaImagen():
-    pixel_data = [] #Lista vacia para almacenar los metadatos
+    pixel_data = []
     for row in grid:
         for color in row:
             pixel_data.extend(color[:3])  # Toma solo los valores RGB
@@ -96,12 +123,11 @@ def GuardaImagen():
     pixel_data = np.reshape(pixel_data, (HEIGHT, WIDTH, 3))
     image = Image.fromarray(pixel_data)
     
+    folder = os.path.dirname(os.path.abspath(__file__))  # Folder para guardar la imagen
+    path = os.path.join(folder, "PixelArt.png")
     
-    Folder = os.path.dirname(os.path.abspath(__file__)) #Folder para guardar la imagen
-    Path = os.path.join(Folder, "PixelArt.png")
-    
-    image.save(Path) #Guarda la imagen
-    print(f"Image saved at {Path}")
+    image.save(path)  # Guarda la imagen
+    print(f"Image saved at {path}")
 
 dpg.create_context()
 
