@@ -16,13 +16,13 @@ class Colores:
         self.g = G
         self.b = B
         self.a = a
-        self.numb = num
+        self.num = num
 
     def ObtenerRGB(self):
         return (self.r, self.g, self.b, self.a)
 
     def ObtenerNum(self):
-        return self.numb
+        return self.num
 
 class ASCII:
     def __init__(self, numero, simbolo):
