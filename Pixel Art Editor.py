@@ -9,32 +9,40 @@ CELL_SIZE = 10
 MIN_CELL_SIZE = 5
 MAX_CELL_SIZE = 20
 
-class Color:
-    def __init__(self, name, R, G, B, a, Num):
-        self.name = name
+class Colores:
+    def __init__(self, color, R, G, B, a, num):
+        self.color = color
         self.r = R
         self.g = G
         self.b = B
         self.a = a
-        self.number = Num
+        self.numb = num
 
     def ObtenerRGB(self):
         return (self.r, self.g, self.b, self.a)
 
     def ObtenerNum(self):
-        return self.number
+        return self.numb
+
+class ASCII:
+    def __init__(self, numero, simbolo):
+        self.numero = numero
+        self.simbolo = simbolo
+
+    def ObtenerSimbolo(self):
+        return self.simbolo
 
 # Instanciación de colores
-Blanco = Color("Blanco", 255, 255, 255, 255, 0)
-Plata = Color("Plata", 192, 192, 192, 255, 1)
-Amarillo = Color("Amarillo", 250, 250, 0, 255, 2)
-Rojo = Color("Rojo", 250, 20, 10, 255, 3)
-Azul = Color("Azul", 10, 10, 245, 255, 4)
-Verde = Color("Verde", 30, 154, 94, 255, 5)
-Siena = Color("Siena", 166, 66, 46, 255, 6)
-Purpura = Color("Purpura", 177, 156, 217, 255, 7)
-Gris = Color("Gris", 64, 64, 79, 255, 8)
-Negro = Color("Negro", 0, 0, 0, 255, 9)
+Blanco = Colores("Blanco", 255, 255, 255, 255, 0)
+Plata = Colores("Plata", 192, 192, 192, 255, 1)
+Amarillo = Colores("Amarillo", 250, 250, 0, 255, 2)
+Rojo = Colores("Rojo", 250, 20, 10, 255, 3)
+Azul = Colores("Azul", 10, 10, 245, 255, 4)
+Verde = Colores("Verde", 30, 154, 94, 255, 5)
+Siena = Colores("Siena", 166, 66, 46, 255, 6)
+Purpura = Colores("Purpura", 177, 156, 217, 255, 7)
+Gris = Colores("Gris", 64, 64, 79, 255, 8)
+Negro = Colores("Negro", 0, 0, 0, 255, 9)
 
 # Diccionarios para acceso rápido
 Colores = {
@@ -61,6 +69,31 @@ ValoresColores = {
     Purpura.ObtenerRGB(): Purpura.ObtenerNum(),
     Gris.ObtenerRGB(): Gris.ObtenerNum(),
     Negro.ObtenerRGB(): Negro.ObtenerNum()
+}
+
+# Instanciación de símbolos ASCII
+Espacio = ASCII(0, ' ')
+Punto = ASCII(1, '.')
+DosPuntos = ASCII(2, ':')
+Guion = ASCII(3, '-')
+Porcentaje = ASCII(4, '%')
+Exclamacion = ASCII(5, '¡')
+Ampersand = ASCII(6, '&')
+Dolar = ASCII(7, '$')
+Porcentaje = ASCII(8, '%')
+Arroba = ASCII(9, '@')
+
+DiccionarioASCII = {
+    0: Espacio.ObtenerSimbolo(),
+    1: Punto.ObtenerSimbolo(),
+    2: DosPuntos.ObtenerSimbolo(),
+    3: Guion.ObtenerSimbolo(),
+    4: Porcentaje.ObtenerSimbolo(),
+    5: Exclamacion.ObtenerSimbolo(),
+    6: Ampersand.ObtenerSimbolo(),
+    7: Dolar.ObtenerSimbolo(),
+    8: Porcentaje.ObtenerSimbolo(),
+    9: Arroba.ObtenerSimbolo()
 }
 
 # Valores iniciales
@@ -97,7 +130,6 @@ def DibujaMatriz():
         print(" ".join(map(str, row)))
 
 def DibujaASCII():
-    DiccionarioASCII = {0: ' ', 1: '.', 2: ':', 3: '-', 4: '%', 5: "¡", 6: "&", 7: "$", 8: "%", 9: "@"}
     matrix = [[ValoresColores[grid[y][x]] for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print("".join(DiccionarioASCII[val] for val in row))
