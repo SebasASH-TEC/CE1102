@@ -10,18 +10,18 @@ MIN_CELL_SIZE = 5
 MAX_CELL_SIZE = 20
 
 class Color:
-    def __init__(self, name, r, g, b, a, number):
+    def __init__(self, name, R, G, B, a, Num):
         self.name = name
-        self.r = r
-        self.g = g
-        self.b = b
+        self.r = R
+        self.g = G
+        self.b = B
         self.a = a
-        self.number = number
+        self.number = Num
 
-    def get_rgba(self):
+    def ObtenerRGB(self):
         return (self.r, self.g, self.b, self.a)
 
-    def get_number(self):
+    def ObtenerNum(self):
         return self.number
 
 # Instanciación de colores
@@ -51,21 +51,21 @@ Colores = {
 }
 
 ValoresColores = {
-    Blanco.get_rgba(): Blanco.get_number(),
-    Plata.get_rgba(): Plata.get_number(),
-    Amarillo.get_rgba(): Amarillo.get_number(),
-    Rojo.get_rgba(): Rojo.get_number(),
-    Azul.get_rgba(): Azul.get_number(),
-    Verde.get_rgba(): Verde.get_number(),
-    Siena.get_rgba(): Siena.get_number(),
-    Purpura.get_rgba(): Purpura.get_number(),
-    Gris.get_rgba(): Gris.get_number(),
-    Negro.get_rgba(): Negro.get_number()
+    Blanco.ObtenerRGB(): Blanco.ObtenerNum(),
+    Plata.ObtenerRGB(): Plata.ObtenerNum(),
+    Amarillo.ObtenerRGB(): Amarillo.ObtenerNum(),
+    Rojo.ObtenerRGB(): Rojo.ObtenerNum(),
+    Azul.ObtenerRGB(): Azul.ObtenerNum(),
+    Verde.ObtenerRGB(): Verde.ObtenerNum(),
+    Siena.ObtenerRGB(): Siena.ObtenerNum(),
+    Purpura.ObtenerRGB(): Purpura.ObtenerNum(),
+    Gris.ObtenerRGB(): Gris.ObtenerNum(),
+    Negro.ObtenerRGB(): Negro.ObtenerNum()
 }
 
 # Valores iniciales
 ColorActual = Colores["Negro"]
-grid = [[Colores["Blanco"].get_rgba() for _ in range(WIDTH)] for _ in range(HEIGHT)]
+grid = [[Colores["Blanco"].ObtenerRGB() for _ in range(WIDTH)] for _ in range(HEIGHT)]
 
 def DibujaGrid():
     dpg.delete_item("Dibujo", children_only=True)
@@ -84,7 +84,7 @@ def ClickPosicion(sender, app_data, user_data):
     x = int(mouse_pos[0] // CELL_SIZE)
     y = int(mouse_pos[1] // CELL_SIZE)
     if 0 <= x < WIDTH and 0 <= y < HEIGHT:
-        grid[y][x] = ColorActual.get_rgba()
+        grid[y][x] = ColorActual.ObtenerRGB()
         DibujaGrid()
         
 def CambioAColorElegido(sender, app_data, user_data):
