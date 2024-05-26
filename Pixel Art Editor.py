@@ -32,6 +32,8 @@ class ASCII:
     def ObtenerSimbolo(self):
         return self.simbolo
 
+
+
 # Instanciación de colores
 Borrador = Colores("Borrador", 255, 255, 255, 255, 0)
 Plata = Colores("Plata", 192, 192, 192, 255, 1)
@@ -96,6 +98,27 @@ DiccionarioASCII = {
     9: Arroba.ObtenerSimbolo()
 }
 
+class Matriz:
+    def __init__(self, width, height, default_value=0):
+        self.width = width
+        self.height = height
+        self.grid = [[default_value for _ in range(width)] for _ in range(height)]
+
+    @classmethod
+    def from_txt(cls, filepath):
+        with open(filepath, 'r') as file:
+            lines = file.readlines()
+        height = len(lines)
+        width = len(lines[0].split())
+        matriz = cls(width, height)
+        for y, line in enumerate(lines):
+            values = list(map(int, line.split()))
+            for x, value in enumerate(values):
+                matriz.grid[y][x] = value
+        return matriz
+
+    def to_color_grid(self, colores_dict):
+        return [[colores_dict[val].ObtenerRGB() for val in row] for row in self.grid]
 # Valores iniciales
 ColorActual = Colores["Negro"]
 grid = [[Colores["Borrador"].ObtenerRGB() for _ in range(WIDTH)] for _ in range(HEIGHT)]
@@ -161,8 +184,15 @@ def GuardaImagen():
     image.save(path)  # Guarda la imagen
     print(f"Image saved at {path}")
 
-def Importar():
-    return
+def Importar(sender, app_data, user_data):
+    filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
+    if os.path.exists(filepath):
+        matriz_importada = Matriz.from_txt(filepath)
+        global grid
+        grid = matriz_importada.to_color_grid(Colores)
+        DibujaGrid()
+    else:
+        print(f"No se encontró el archivo {filepath}")
 
 dpg.create_context()
 
