@@ -33,7 +33,7 @@ class ASCII:
         return self.simbolo
 
 # Instanciación de colores
-Blanco = Colores("Blanco", 255, 255, 255, 255, 0)
+Borrador = Colores("Borrador", 255, 255, 255, 255, 0)
 Plata = Colores("Plata", 192, 192, 192, 255, 1)
 Amarillo = Colores("Amarillo", 250, 250, 0, 255, 2)
 Rojo = Colores("Rojo", 250, 20, 10, 255, 3)
@@ -46,7 +46,7 @@ Negro = Colores("Negro", 0, 0, 0, 255, 9)
 
 # Diccionarios para acceso rápido
 Colores = {
-    "Blanco": Blanco,
+    "Borrador": Borrador,
     "Plata": Plata,
     "Amarillo": Amarillo,
     "Rojo": Rojo,
@@ -59,7 +59,7 @@ Colores = {
 }
 
 ValoresColores = {
-    Blanco.ObtenerRGB(): Blanco.ObtenerNum(),
+    Borrador.ObtenerRGB(): Borrador.ObtenerNum(),
     Plata.ObtenerRGB(): Plata.ObtenerNum(),
     Amarillo.ObtenerRGB(): Amarillo.ObtenerNum(),
     Rojo.ObtenerRGB(): Rojo.ObtenerNum(),
@@ -98,7 +98,7 @@ DiccionarioASCII = {
 
 # Valores iniciales
 ColorActual = Colores["Negro"]
-grid = [[Colores["Blanco"].ObtenerRGB() for _ in range(WIDTH)] for _ in range(HEIGHT)]
+grid = [[Colores["Borrador"].ObtenerRGB() for _ in range(WIDTH)] for _ in range(HEIGHT)]
 
 def DibujaGrid():
     dpg.delete_item("Dibujo", children_only=True)
@@ -161,23 +161,27 @@ def GuardaImagen():
     image.save(path)  # Guarda la imagen
     print(f"Image saved at {path}")
 
+def Importar():
+    return
+
 dpg.create_context()
 
 with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
     with dpg.group(horizontal=True):
-        for color_name in Colores:
-            dpg.add_button(label=color_name, callback=CambioAColorElegido, user_data=color_name)
-    
-    with dpg.group(horizontal=True):
-        dpg.add_button(label="Zoom In", callback=ZoomIn)
-        dpg.add_button(label="Zoom Out", callback=ZoomOut)
-    
-    with dpg.drawlist(width=WIDTH * CELL_SIZE, height=HEIGHT * CELL_SIZE, tag="Dibujo"):
-        dpg.set_item_callback("Dibujo", ClickPosicion)
+        with dpg.group():
+            with dpg.drawlist(width=WIDTH * CELL_SIZE, height=HEIGHT * CELL_SIZE, tag="Dibujo"):
+                dpg.set_item_callback("Dibujo", ClickPosicion)
 
-    dpg.add_button(label="Mostrar Matrix", callback=DibujaMatriz)
-    dpg.add_button(label="Mostrar ASCII", callback=DibujaASCII)
-    dpg.add_button(label="Guardar Imagen", callback=GuardaImagen)
+        with dpg.group():
+            for color_name in Colores:
+                dpg.add_button(label=color_name, callback=CambioAColorElegido, user_data=color_name)
+            
+            dpg.add_button(label="Zoom In", callback=ZoomIn)
+            dpg.add_button(label="Zoom Out", callback=ZoomOut)
+            dpg.add_button(label="Mostrar Matrix", callback=DibujaMatriz)
+            dpg.add_button(label="Mostrar ASCII", callback=DibujaASCII)
+            dpg.add_button(label="Importar imagen", callback=Importar)
+            dpg.add_button(label="Guardar Imagen", callback=GuardaImagen)
 
 DibujaGrid()
 
