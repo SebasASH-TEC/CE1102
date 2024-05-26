@@ -4,7 +4,7 @@ from PIL import Image
 import os
 
 # Constantes
-WIDTH, HEIGHT = 50, 50
+WIDTH, HEIGHT = 60, 60
 CELL_SIZE = 10
 MIN_CELL_SIZE = 5
 MAX_CELL_SIZE = 20
@@ -200,6 +200,11 @@ def Importar(sender, app_data, user_data):
 
 dpg.create_context()
 
+with dpg.font_registry():
+    # first argument ids the path to the .ttf or .otf file
+    default_font = dpg.add_font("Roboto-Light.ttf", 20)
+    second_font = dpg.add_font("Roboto-Light.ttf", 10)
+
 with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
     with dpg.group(horizontal=True):
         with dpg.group():
@@ -208,14 +213,15 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
 
         with dpg.group():
             for color_name in Colores:
-                dpg.add_button(label=color_name, callback=CambioAColorElegido, user_data=color_name)
+                dpg.add_button(label=color_name, callback=CambioAColorElegido, user_data=color_name, width=100, height=30)
             
-            dpg.add_button(label="Zoom In", callback=ZoomIn)
-            dpg.add_button(label="Zoom Out", callback=ZoomOut)
-            dpg.add_button(label="Mostrar Matrix", callback=DibujaMatriz)
-            dpg.add_button(label="Mostrar ASCII", callback=DibujaASCII)
-            dpg.add_button(label="Importar imagen", callback=Importar)
-            dpg.add_button(label="Guardar Imagen", callback=GuardaImagen)
+            dpg.add_button(label="Zoom In", callback=ZoomIn, width=100, height=30)
+            dpg.add_button(label="Zoom Out", callback=ZoomOut, width=100, height=30)
+            dpg.add_button(label="Mostrar Matrix", callback=DibujaMatriz, width=140, height=30)
+            dpg.add_button(label="Mostrar ASCII", callback=DibujaASCII, width=140, height=30)
+            dpg.add_button(label="Importar imagen", callback=Importar, width=140, height=30)
+            dpg.add_button(label="Guardar Imagen", callback=GuardaImagen, width=140, height=30)
+            dpg.bind_font(default_font)
 
 DibujaGrid()
 
