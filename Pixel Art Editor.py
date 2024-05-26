@@ -180,17 +180,11 @@ def GuardaImagen():
             NuevoRow.extend([color[:3], color[:3]])  # Duplicate each pixel horizontally
         GridExpandido.extend([NuevoRow, NuevoRow])  # Duplicate each row vertically
     
-    # Convert the expanded grid to a numpy array
-    pixel_data = np.array(GridExpandido, dtype=np.uint8)
-    
-    # Create an image from the array
+    pixel_data = np.array(GridExpandido, dtype=np.uint8) #Convierte el grid expandido en un array de numpy 
     image = Image.fromarray(pixel_data)
-    
-    # Define the save path
-    folder = os.path.dirname(os.path.abspath(__file__))  # Folder to save the image
+    folder = os.path.dirname(os.path.abspath(__file__)) 
     path = os.path.join(folder, "PixelArt.png")
     
-    # Save the image
     image.save(path)
     print(f"Image saved at {path}")
 
