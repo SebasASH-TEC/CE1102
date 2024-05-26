@@ -163,7 +163,7 @@ def GuardaImagen():
 
 dpg.create_context()
 
-with dpg.window(label="Pixel Art Editor"):
+with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
     with dpg.group(horizontal=True):
         for color_name in Colores:
             dpg.add_button(label=color_name, callback=CambioAColorElegido, user_data=color_name)
@@ -184,5 +184,6 @@ DibujaGrid()
 dpg.create_viewport(title='Pixel Art Editor', width=800, height=600)
 dpg.setup_dearpygui()
 dpg.show_viewport()
+dpg.set_primary_window("Primary Window", True)
 dpg.start_dearpygui()
 dpg.destroy_context()
