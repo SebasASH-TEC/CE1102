@@ -32,7 +32,26 @@ class ASCII:
     def ObtenerSimbolo(self):
         return self.simbolo
 
+class Matriz:
+    def __init__(self, width, height, default_value=0):
+        self.width = width
+        self.height = height
+        self.grid = [[default_value for _ in range(width)] for _ in range(height)]
 
+    @classmethod
+    def LeerTXT(cls, filepath, width=WIDTH, height=HEIGHT, default_value=0):
+        with open(filepath, 'r') as file:
+            lines = file.readlines()
+        matriz = cls(width, height, default_value)
+        for y, line in enumerate(lines):
+            values = list(map(int, line.split()))
+            for x, value in enumerate(values):
+                if x < width and y < height:
+                    matriz.grid[y][x] = value
+        return matriz
+
+    def ConvertirAGrid(self, colores_dict):
+        return [[colores_dict.get(val, colores_dict[0]).ObtenerRGB() for val in row] for row in self.grid]
 
 # Instanciación de colores
 Borrador = Colores("Borrador", 255, 255, 255, 255, 0)
@@ -61,16 +80,16 @@ Colores = {
 }
 
 ValoresColores = {
-    Borrador.ObtenerRGB(): Borrador.ObtenerNum(),
-    Plata.ObtenerRGB(): Plata.ObtenerNum(),
-    Amarillo.ObtenerRGB(): Amarillo.ObtenerNum(),
-    Rojo.ObtenerRGB(): Rojo.ObtenerNum(),
-    Azul.ObtenerRGB(): Azul.ObtenerNum(),
-    Verde.ObtenerRGB(): Verde.ObtenerNum(),
-    Siena.ObtenerRGB(): Siena.ObtenerNum(),
-    Purpura.ObtenerRGB(): Purpura.ObtenerNum(),
-    Gris.ObtenerRGB(): Gris.ObtenerNum(),
-    Negro.ObtenerRGB(): Negro.ObtenerNum()
+    0: Borrador,
+    1: Plata,
+    2: Amarillo,
+    3: Rojo,
+    4: Azul,
+    5: Verde,
+    6: Siena,
+    7: Purpura,
+    8: Gris,
+    9: Negro
 }
 
 # Instanciación de símbolos ASCII
@@ -82,7 +101,6 @@ Porcentaje = ASCII(4, '%')
 Exclamacion = ASCII(5, '¡')
 Ampersand = ASCII(6, '&')
 Dolar = ASCII(7, '$')
-Porcentaje = ASCII(8, '%')
 Arroba = ASCII(9, '@')
 
 DiccionarioASCII = {
@@ -98,27 +116,6 @@ DiccionarioASCII = {
     9: Arroba.ObtenerSimbolo()
 }
 
-class Matriz:
-    def __init__(self, width, height, default_value=0):
-        self.width = width
-        self.height = height
-        self.grid = [[default_value for _ in range(width)] for _ in range(height)]
-
-    @classmethod
-    def from_txt(cls, filepath):
-        with open(filepath, 'r') as file:
-            lines = file.readlines()
-        height = len(lines)
-        width = len(lines[0].split())
-        matriz = cls(width, height)
-        for y, line in enumerate(lines):
-            values = list(map(int, line.split()))
-            for x, value in enumerate(values):
-                matriz.grid[y][x] = value
-        return matriz
-
-    def to_color_grid(self, colores_dict):
-        return [[colores_dict[val].ObtenerRGB() for val in row] for row in self.grid]
 # Valores iniciales
 ColorActual = Colores["Negro"]
 grid = [[Colores["Borrador"].ObtenerRGB() for _ in range(WIDTH)] for _ in range(HEIGHT)]
@@ -142,20 +139,26 @@ def ClickPosicion(sender, app_data, user_data):
     if 0 <= x < WIDTH and 0 <= y < HEIGHT:
         grid[y][x] = ColorActual.ObtenerRGB()
         DibujaGrid()
-        
+
 def CambioAColorElegido(sender, app_data, user_data):
     global ColorActual
     ColorActual = Colores[user_data]
 
 def DibujaMatriz():
-    matrix = [[ValoresColores[grid[y][x]] for x in range(WIDTH)] for y in range(HEIGHT)]
+    matrix = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print(" ".join(map(str, row)))
 
 def DibujaASCII():
-    matrix = [[ValoresColores[grid[y][x]] for x in range(WIDTH)] for y in range(HEIGHT)]
+    matrix = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print("".join(DiccionarioASCII[val] for val in row))
+
+def ValoresColorANumero(rgb):
+    for num, color in ValoresColores.items():
+        if color.ObtenerRGB() == rgb:
+            return num
+    return 0  # Si no encuentra, usa borrador por defecto
 
 def ZoomIn():
     global CELL_SIZE
@@ -187,9 +190,9 @@ def GuardaImagen():
 def Importar(sender, app_data, user_data):
     filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
     if os.path.exists(filepath):
-        matriz_importada = Matriz.from_txt(filepath)
+        matriz_importada = Matriz.LeerTXT(filepath)
         global grid
-        grid = matriz_importada.to_color_grid(Colores)
+        grid = matriz_importada.ConvertirAGrid(ValoresColores)
         DibujaGrid()
     else:
         print(f"No se encontró el archivo {filepath}")
