@@ -145,20 +145,20 @@ def CambioAColorElegido(sender, app_data, user_data):
     ColorActual = Colores[user_data]
 
 def DibujaMatriz():
-    matrix = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
+    matrix = [[valores_color_a_numero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print(" ".join(map(str, row)))
 
 def DibujaASCII():
-    matrix = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
+    matrix = [[valores_color_a_numero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print("".join(DiccionarioASCII[val] for val in row))
 
-def ValoresColorANumero(rgb):
+def valores_color_a_numero(rgb):
     for num, color in ValoresColores.items():
         if color.ObtenerRGB() == rgb:
             return num
-    return 0  # Si no encuentra, usa borrador por defecto
+    return 0  # Default to Borrador if no match found
 
 def ZoomIn():
     global CELL_SIZE
@@ -173,18 +173,25 @@ def ZoomOut():
         DibujaGrid()
 
 def GuardaImagen():
-    pixel_data = []
+    GridExpandido = [] # Crea un nuevo grid donde cada pixel se convierte en un 2x2 (Como el checkboarding de la playstation)
     for row in grid:
+        NuevoRow = []
         for color in row:
-            pixel_data.extend(color[:3])  # Toma solo los valores RGB
-    pixel_data = np.array(pixel_data, dtype=np.uint8)
-    pixel_data = np.reshape(pixel_data, (HEIGHT, WIDTH, 3))
+            NuevoRow.extend([color[:3], color[:3]])  # Duplicate each pixel horizontally
+        GridExpandido.extend([NuevoRow, NuevoRow])  # Duplicate each row vertically
+    
+    # Convert the expanded grid to a numpy array
+    pixel_data = np.array(GridExpandido, dtype=np.uint8)
+    
+    # Create an image from the array
     image = Image.fromarray(pixel_data)
     
-    folder = os.path.dirname(os.path.abspath(__file__))  # Folder para guardar la imagen
+    # Define the save path
+    folder = os.path.dirname(os.path.abspath(__file__))  # Folder to save the image
     path = os.path.join(folder, "PixelArt.png")
     
-    image.save(path)  # Guarda la imagen
+    # Save the image
+    image.save(path)
     print(f"Image saved at {path}")
 
 def Importar(sender, app_data, user_data):
