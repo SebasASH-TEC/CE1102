@@ -4,7 +4,7 @@ from PIL import Image
 import os
 
 # Constantes
-WIDTH, HEIGHT = 60, 60
+WIDTH, HEIGHT = 50, 50
 CELL_SIZE = 10
 MIN_CELL_SIZE = 5
 MAX_CELL_SIZE = 20
@@ -145,20 +145,20 @@ def CambioAColorElegido(sender, app_data, user_data):
     ColorActual = Colores[user_data]
 
 def DibujaMatriz():
-    matrix = [[valores_color_a_numero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
+    matrix = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print(" ".join(map(str, row)))
 
 def DibujaASCII():
-    matrix = [[valores_color_a_numero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
+    matrix = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print("".join(DiccionarioASCII[val] for val in row))
 
-def valores_color_a_numero(rgb):
+def ValoresColorANumero(rgb):
     for num, color in ValoresColores.items():
         if color.ObtenerRGB() == rgb:
             return num
-    return 0  # Default to Borrador if no match found
+    return 0  # Retorna a borrador (BLanco) si no se encuentra
 
 def ZoomIn():
     global CELL_SIZE
@@ -177,23 +177,30 @@ def GuardaImagen():
     for row in grid:
         NuevoRow = []
         for color in row:
-            NuevoRow.extend([color[:3], color[:3]])  # Duplicate each pixel horizontally
-        GridExpandido.extend([NuevoRow, NuevoRow])  # Duplicate each row vertically
+            NuevoRow.extend([color[:3], color[:3]])  # Duplica cada pixel horizontalmente
+        GridExpandido.extend([NuevoRow, NuevoRow])  # Verticalmente
     
     pixel_data = np.array(GridExpandido, dtype=np.uint8) #Convierte el grid expandido en un array de numpy 
     image = Image.fromarray(pixel_data)
     folder = os.path.dirname(os.path.abspath(__file__)) 
     path = os.path.join(folder, "PixelArt.png")
+    TXTPath = os.path.join(folder, "PixelArt.txt")
     
     image.save(path)
     print(f"Image saved at {path}")
 
-def Importar(sender, app_data, user_data):
+    Matriz = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
+    with open(TXTPath, 'w') as file:
+        for row in Matriz:
+            file.write(" ".join(map(str, row)) + "\n")
+    print(f"Matrix saved at {TXTPath}")
+    
+def ImportarImagen(sender, app_data, user_data):
     filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
     if os.path.exists(filepath):
-        matriz_importada = Matriz.LeerTXT(filepath)
+        MatrizImportada = Matriz.LeerTXT(filepath)
         global grid
-        grid = matriz_importada.ConvertirAGrid(ValoresColores)
+        grid = MatrizImportada.ConvertirAGrid(ValoresColores)
         DibujaGrid()
     else:
         print(f"No se encontró el archivo {filepath}")
@@ -219,7 +226,7 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             dpg.add_button(label="Zoom Out", callback=ZoomOut, width=100, height=30)
             dpg.add_button(label="Mostrar Matrix", callback=DibujaMatriz, width=140, height=30)
             dpg.add_button(label="Mostrar ASCII", callback=DibujaASCII, width=140, height=30)
-            dpg.add_button(label="Importar imagen", callback=Importar, width=140, height=30)
+            dpg.add_button(label="Importar imagen", callback=ImportarImagen, width=140, height=30)
             dpg.add_button(label="Guardar Imagen", callback=GuardaImagen, width=140, height=30)
             dpg.bind_font(default_font)
 
