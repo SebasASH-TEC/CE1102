@@ -145,6 +145,7 @@ def CambioAColorElegido(sender, app_data, user_data):
     ColorActual = Colores[user_data]
 
 def DibujaMatriz():
+    global matrix
     matrix = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
     for row in matrix:
         print(" ".join(map(str, row)))
@@ -205,6 +206,19 @@ def ImportarImagen(sender, app_data, user_data):
     else:
         print(f"No se encontró el archivo {filepath}")
 
+def Altocontraste():
+    global grid
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
+            valor = ValoresColorANumero(grid[y][x])
+            if 0 <= valor <= 4:
+                grid[y][x] = ValoresColores[1].ObtenerRGB()  # Cambiar a color Plata
+            elif 5 <= valor <= 9:
+                grid[y][x] = ValoresColores[9].ObtenerRGB()  # Cambiar a color Negro
+    DibujaGrid()
+
+
+
 dpg.create_context()
 
 with dpg.font_registry():
@@ -228,11 +242,12 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             dpg.add_button(label="Mostrar ASCII", callback=DibujaASCII, width=140, height=30)
             dpg.add_button(label="Importar imagen", callback=ImportarImagen, width=140, height=30)
             dpg.add_button(label="Guardar Imagen", callback=GuardaImagen, width=140, height=30)
+            dpg.add_button(label="Alto contraste", callback=Altocontraste, width=140, height=30)
             dpg.bind_font(default_font)
 
 DibujaGrid()
 
-dpg.create_viewport(title='Pixel Art Editor', width=800, height=600)
+dpg.create_viewport(title='Pixel Art Editor', width=800, height=800)
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.set_primary_window("Primary Window", True)
