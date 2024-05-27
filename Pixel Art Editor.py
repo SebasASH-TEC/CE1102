@@ -221,6 +221,35 @@ def Altocontraste():
             elif 5 <= valor <= 9:
                 grid[y][x] = ValoresColores[9].ObtenerRGB()  # Cambiar a color Negro
     DibujaGrid()
+
+
+def Negativo():
+    global grid
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
+            valor = ValoresColorANumero(grid[y][x])
+            if valor == 9:
+                grid[y][x] = ValoresColores[0].ObtenerRGB()
+            elif valor == 8:
+                grid[y][x] = ValoresColores[1].ObtenerRGB()
+            elif valor == 7:
+                grid[y][x] = ValoresColores[2].ObtenerRGB()
+            elif valor == 6:
+                grid[y][x] = ValoresColores[3].ObtenerRGB()
+            elif valor == 5:
+                grid[y][x] = ValoresColores[4].ObtenerRGB()
+            elif valor == 4:
+                grid[y][x] = ValoresColores[5].ObtenerRGB()
+            elif valor == 3:
+                grid[y][x] = ValoresColores[6].ObtenerRGB()
+            elif valor == 2:
+                grid[y][x] = ValoresColores[7].ObtenerRGB()
+            elif valor == 1:
+                grid[y][x] = ValoresColores[8].ObtenerRGB()
+            elif valor == 0:
+                grid[y][x] = ValoresColores[9].ObtenerRGB()
+
+    DibujaGrid()
     
 dpg.create_context()
 
@@ -247,6 +276,7 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             dpg.add_button(label="Guardar Imagen", callback=GuardaImagen, width=140, height=30)
             dpg.add_button(label="X", callback=BorraImagen, width=100, height=30)
             dpg.add_button(label="Alto contraste", callback=Altocontraste, width=140, height=30)
+            dpg.add_button(label="Negativo", callback=Negativo, width=140, height=30)
             dpg.bind_font(default_font)
 
 DibujaGrid()
