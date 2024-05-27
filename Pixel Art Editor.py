@@ -206,6 +206,11 @@ def ImportarImagen(sender, app_data, user_data):
     else:
         print(f"No se encontró el archivo {filepath}")
 
+def BorraImagen():
+    global grid
+    grid = [[Colores["Borrador"].ObtenerRGB() for _ in range(WIDTH)] for _ in range(HEIGHT)]
+    DibujaGrid()
+
 def Altocontraste():
     global grid
     for y in range(HEIGHT):
@@ -216,9 +221,7 @@ def Altocontraste():
             elif 5 <= valor <= 9:
                 grid[y][x] = ValoresColores[9].ObtenerRGB()  # Cambiar a color Negro
     DibujaGrid()
-
-
-
+    
 dpg.create_context()
 
 with dpg.font_registry():
@@ -242,6 +245,7 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             dpg.add_button(label="Mostrar ASCII", callback=DibujaASCII, width=140, height=30)
             dpg.add_button(label="Importar imagen", callback=ImportarImagen, width=140, height=30)
             dpg.add_button(label="Guardar Imagen", callback=GuardaImagen, width=140, height=30)
+            dpg.add_button(label="X", callback=BorraImagen, width=100, height=30)
             dpg.add_button(label="Alto contraste", callback=Altocontraste, width=140, height=30)
             dpg.bind_font(default_font)
 
