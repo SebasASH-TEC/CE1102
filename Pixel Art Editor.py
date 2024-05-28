@@ -210,7 +210,7 @@ def GuardaImagen():
     
 def ImportarImagen(sender, app_data, user_data):
     DirectorioPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
-    if os.path.exists(filepath):
+    if os.path.exists(DirectorioPath):
         MatrizImportada = Matriz.LeerTXT(DirectorioPath)
         global grid
         grid = MatrizImportada.ConvertirAGrid(ValoresColores)
