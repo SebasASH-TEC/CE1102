@@ -52,6 +52,18 @@ class Matriz:
 
     def ConvertirAGrid(self, colores_dict):
         return [[colores_dict.get(val, colores_dict[0]).ObtenerRGB() for val in row] for row in self.grid]
+    
+class Boton:
+    def __init__(self, label, callback, user_data=None, width=100, height=30):
+        self.label = label
+        self.callback = callback
+        self.user_data = user_data
+        self.width = width
+        self.height = height
+
+    def CrearBoton(self):
+        dpg.add_button(label=self.label, callback=self.callback, user_data=self.user_data, width=self.width, height=self.height)
+
 
 # Instanciación de colores
 Borrador = Colores("Borrador", 255, 255, 255, 255, 0)
@@ -277,10 +289,9 @@ def Rotarizquierda():
 
 dpg.create_context()
 
-with dpg.font_registry():
-    # first argument ids the path to the .ttf or .otf file
-    default_font = dpg.add_font("Roboto-Light.ttf", 20)
-    second_font = dpg.add_font("Roboto-Light.ttf", 10)
+with dpg.font_registry(): #Fuente para el editor 
+    FuentePorDefecto = dpg.add_font("Roboto-Light.ttf", 20)
+    FuenteSecundaria = dpg.add_font("Roboto-Light.ttf", 10)
 
 with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
     with dpg.group(horizontal=True):
@@ -289,21 +300,22 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
                 dpg.set_item_callback("Dibujo", ClickPosicion)
 
         with dpg.group():
-            for color_name in Colores:
-                dpg.add_button(label=color_name, callback=CambioAColorElegido, user_data=color_name, width=100, height=30)
+            # Crea botones para los colores
+            for NombreDeColor in Colores:
+                Boton(label=NombreDeColor, callback=CambioAColorElegido, user_data=NombreDeColor).CrearBoton()
             
-            dpg.add_button(label="Zoom In", callback=ZoomIn, width=100, height=30)
-            dpg.add_button(label="Zoom Out", callback=ZoomOut, width=100, height=30)
-            dpg.add_button(label="Mostrar Matrix", callback=DibujaMatriz, width=140, height=30)
-            dpg.add_button(label="Mostrar ASCII", callback=DibujaASCII, width=140, height=30)
-            dpg.add_button(label="Importar imagen", callback=ImportarImagen, width=140, height=30)
-            dpg.add_button(label="Guardar Imagen", callback=GuardaImagen, width=140, height=30)
-            dpg.add_button(label="Alto contraste", callback=Altocontraste, width=140, height=30)
-            dpg.add_button(label="Negativo", callback=Negativo, width=140, height=30)
-            dpg.add_button(label="X", callback=BorraImagen, width=100, height=30)
-            dpg.add_button(label="Rotar a la derecha", callback=Rotarderecha, width=140, height=30)
-            dpg.add_button(label="Rotar a la izquierda", callback=Rotarizquierda, width=140, height=30)
-            dpg.bind_font(default_font)
+            Boton(label="Zoom In", callback=ZoomIn).CrearBoton()
+            Boton(label="Zoom Out", callback=ZoomOut).CrearBoton()
+            Boton(label="Mostrar Matrix", callback=DibujaMatriz, width=140).CrearBoton()
+            Boton(label="Mostrar ASCII", callback=DibujaASCII, width=140).CrearBoton()
+            Boton(label="Importar imagen", callback=ImportarImagen, width=140).CrearBoton()
+            Boton(label="Guardar Imagen", callback=GuardaImagen, width=140).CrearBoton()
+            Boton(label="Alto contraste", callback=Altocontraste, width=140).CrearBoton()
+            Boton(label="Negativo", callback=Negativo, width=140).CrearBoton()
+            Boton(label="X", callback=BorraImagen).CrearBoton()
+            Boton(label="Rotar a la derecha", callback=Rotarderecha, width=140).CrearBoton()
+            Boton(label="Rotar a la izquierda", callback=Rotarizquierda, width=140).CrearBoton()
+            dpg.bind_font(FuentePorDefecto)
             
 DibujaGrid()
 
