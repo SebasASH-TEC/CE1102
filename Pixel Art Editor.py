@@ -51,7 +51,7 @@ class Matriz:
         return matriz
 
     def ConvertirAGrid(self, colores_dict):
-        return [[colores_dict.get(val, colores_dict[0]).ObtenerRGB() for val in row] for row in self.grid]
+        return [[colores_dict.get(val, colores_dict[0]).ObtenerRGB() for val in fila] for fila in self.grid]
     
 class Boton:
     def __init__(self, label, callback, user_data=None, width=100, height=30):
@@ -132,66 +132,66 @@ DiccionarioASCII = {
 ColorActual = Colores["Negro"]
 grid = [[Colores["Borrador"].ObtenerRGB() for _ in range(WIDTH)] for _ in range(HEIGHT)]
 
-def DibujaGrid():
-    dpg.delete_item("Dibujo", children_only=True)
+def DibujaGrid(): 
+    dpg.delete_item("Dibujo", children_only=True) #el children_only elimina solo las "subventanas", no la principal
     for y in range(HEIGHT):
-        for x in range(WIDTH):
+        for x in range(WIDTH): #For anidados para dibujar la matriz
             dpg.draw_rectangle([x * CELL_SIZE, y * CELL_SIZE],
                                [(x + 1) * CELL_SIZE, (y + 1) * CELL_SIZE],
-                               color=(0, 0, 0, 255), fill=grid[y][x], parent="Dibujo")
+                               color=(0, 0, 0, 255), fill=grid[y][x], parent="Dibujo") #Dibuja la matriz, utiliza el CELL_SIZE para saber de que tamano representar cada pixel
     for x in range(WIDTH + 1):
         dpg.draw_line([x * CELL_SIZE, 0], [x * CELL_SIZE, HEIGHT * CELL_SIZE], color=(0, 0, 0, 255), thickness=1, parent="Dibujo")
     for y in range(HEIGHT + 1):
         dpg.draw_line([0, y * CELL_SIZE], [WIDTH * CELL_SIZE, y * CELL_SIZE], color=(0, 0, 0, 255), thickness=1, parent="Dibujo")
 
-def ClickPosicion(sender, app_data, user_data):
-    mouse_pos = dpg.get_mouse_pos()
+def ClickPosicion(sender, app_data, user_data): #Funcion para detectar donde se presiona, aunque tiene errores de colision, es temporal
+    mouse_pos = dpg.get_mouse_pos() #mouse_pos es una funcion de DearPyGUI
     x = int(mouse_pos[0] // CELL_SIZE)
     y = int(mouse_pos[1] // CELL_SIZE)
-    if 0 <= x < WIDTH and 0 <= y < HEIGHT:
+    if 0 <= x < WIDTH and 0 <= y < HEIGHT: #Verifica si el mouse clickea dentro del grid
         grid[y][x] = ColorActual.ObtenerRGB()
         DibujaGrid()
 
-def CambioAColorElegido(sender, app_data, user_data):
+def CambioAColorElegido(sender, app_data, user_data): #Funcion que cambia el color a colocar segun seleccion del usuario
     global ColorActual
     ColorActual = Colores[user_data]
 
-def DibujaMatriz():
-    global matrix
-    matrix = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
-    for row in matrix:
-        print(" ".join(map(str, row)))
+def DibujaMatriz(): #Dibuja la matriz en consola (de momento), segun los pixeles que se encuentre y su numero asociado
+    global Matriz
+    Matriz = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
+    for fila in Matriz:
+        print(" ".join(map(str, fila)))
 
-def DibujaASCII():
-    matrix = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
-    for row in matrix:
-        print("".join(DiccionarioASCII[val] for val in row))
+def DibujaASCII(): #Lo mismo, pero con ASCII
+    Matriz = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
+    for fila in Matriz:
+        print("".join(DiccionarioASCII[val] for val in fila))
 
-def ValoresColorANumero(rgb):
+def ValoresColorANumero(rgb): 
     for num, color in ValoresColores.items():
         if color.ObtenerRGB() == rgb:
             return num
     return 0  # Retorna a borrador (BLanco) si no se encuentra
 
-def ZoomIn():
+def ZoomIn(): #Aumenta el tamano de la celda en 1 unidad (Tamano maximo 20)
     global CELL_SIZE
     if CELL_SIZE < MAX_CELL_SIZE:
         CELL_SIZE += 1
         DibujaGrid()
 
-def ZoomOut():
+def ZoomOut(): #Decrementa el tamano de la celda en 1 unidad (Tamano minimo 5)
     global CELL_SIZE
     if CELL_SIZE > MIN_CELL_SIZE:
         CELL_SIZE -= 1
         DibujaGrid()
 
 def GuardaImagen():
-    GridExpandido = [] # Crea un nuevo grid donde cada pixel se convierte en un 2x2 (Como el checkboarding de la playstation)
-    for row in grid:
-        NuevoRow = []
-        for color in row:
-            NuevoRow.extend([color[:3], color[:3]])  # Duplica cada pixel horizontalmente
-        GridExpandido.extend([NuevoRow, NuevoRow])  # Verticalmente
+    GridExpandido = [] # Crea un nuevo grid donde cada pixel se convierte en un 2x2 (Como el checkerboard de la playstation)
+    for fila in grid:
+        NuevaFila = []
+        for color in fila:
+            NuevaFila.extend([color[:3], color[:3]])  # Duplica cada pixel horizontalmente
+        GridExpandido.extend([NuevaFila, NuevaFila])  # Verticalmente
     
     pixel_data = np.array(GridExpandido, dtype=np.uint8) #Convierte el grid expandido en un array de numpy 
     image = Image.fromarray(pixel_data)
@@ -204,8 +204,8 @@ def GuardaImagen():
 
     Matriz = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
     with open(TXTPath, 'w') as file:
-        for row in Matriz:
-            file.write(" ".join(map(str, row)) + "\n")
+        for fila in Matriz:
+            file.write(" ".join(map(str, fila)) + "\n")
     print(f"Matrix saved at {TXTPath}")
     
 def ImportarImagen(sender, app_data, user_data):
@@ -218,7 +218,7 @@ def ImportarImagen(sender, app_data, user_data):
     else:
         print(f"No se encontró el archivo {filepath}")
 
-def BorraImagen():
+def BorraImagen(): #Convierte todos los valores del grid en 0 (Blanco)
     global grid
     grid = [[Colores["Borrador"].ObtenerRGB() for _ in range(WIDTH)] for _ in range(HEIGHT)]
     DibujaGrid()
@@ -233,7 +233,6 @@ def Altocontraste():
             elif 5 <= valor <= 9:
                 grid[y][x] = ValoresColores[9].ObtenerRGB()  # Cambiar a color Negro
     DibujaGrid()
-
 
 def Negativo():
     global grid
@@ -306,7 +305,7 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             
             Boton(label="Zoom In", callback=ZoomIn).CrearBoton()
             Boton(label="Zoom Out", callback=ZoomOut).CrearBoton()
-            Boton(label="Mostrar Matrix", callback=DibujaMatriz, width=140).CrearBoton()
+            Boton(label="Mostrar Matriz", callback=DibujaMatriz, width=140).CrearBoton()
             Boton(label="Mostrar ASCII", callback=DibujaASCII, width=140).CrearBoton()
             Boton(label="Importar imagen", callback=ImportarImagen, width=140).CrearBoton()
             Boton(label="Guardar Imagen", callback=GuardaImagen, width=140).CrearBoton()
