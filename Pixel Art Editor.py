@@ -275,8 +275,6 @@ def Rotarizquierda():
     grid = nueva_grid
     DibujaGrid()
 
-
-
 dpg.create_context()
 
 with dpg.font_registry():
@@ -302,14 +300,11 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             dpg.add_button(label="Guardar Imagen", callback=GuardaImagen, width=140, height=30)
             dpg.add_button(label="Alto contraste", callback=Altocontraste, width=140, height=30)
             dpg.add_button(label="Negativo", callback=Negativo, width=140, height=30)
+            dpg.add_button(label="X", callback=BorraImagen, width=100, height=30)
             dpg.add_button(label="Rotar a la derecha", callback=Rotarderecha, width=140, height=30)
             dpg.add_button(label="Rotar a la izquierda", callback=Rotarizquierda, width=140, height=30)
             dpg.bind_font(default_font)
-        
-        with dpg.group():
-            dpg.add_button(label="X", callback=BorraImagen, width=100, height=30)
-
-
+            
 DibujaGrid()
 
 dpg.create_viewport(title='Pixel Art Editor', width=800, height=800)
