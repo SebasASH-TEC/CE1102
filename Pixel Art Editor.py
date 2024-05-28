@@ -194,29 +194,29 @@ def GuardaImagen():
         GridExpandido.extend([NuevaFila, NuevaFila])  # Verticalmente
     
     pixel_data = np.array(GridExpandido, dtype=np.uint8) #Convierte el grid expandido en un array de numpy 
-    image = Image.fromarray(pixel_data)
-    folder = os.path.dirname(os.path.abspath(__file__)) 
-    path = os.path.join(folder, "PixelArt.png")
-    TXTPath = os.path.join(folder, "PixelArt.txt")
+    Imagen = Image.fromarray(pixel_data)
+    Folder = os.path.dirname(os.path.abspath(__file__)) 
+    DirectorioPath = os.path.join(Folder, "PixelArt.png")
+    TXTPath = os.path.join(Folder, "PixelArt.txt")
     
-    image.save(path)
-    print(f"Image saved at {path}")
+    Imagen.save(DirectorioPath)
+    print(f"Imagen guardada en el directorio: {DirectorioPath}")
 
     Matriz = [[ValoresColorANumero(grid[y][x]) for x in range(WIDTH)] for y in range(HEIGHT)]
     with open(TXTPath, 'w') as file:
         for fila in Matriz:
             file.write(" ".join(map(str, fila)) + "\n")
-    print(f"Matrix saved at {TXTPath}")
+    print(f"Matriz guardada en el directorio: {TXTPath}")
     
 def ImportarImagen(sender, app_data, user_data):
-    filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
+    DirectorioPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
     if os.path.exists(filepath):
-        MatrizImportada = Matriz.LeerTXT(filepath)
+        MatrizImportada = Matriz.LeerTXT(DirectorioPath)
         global grid
         grid = MatrizImportada.ConvertirAGrid(ValoresColores)
         DibujaGrid()
     else:
-        print(f"No se encontró el archivo {filepath}")
+        print(f"No se encontró el archivo {DirectorioPath}")
 
 def BorraImagen(): #Convierte todos los valores del grid en 0 (Blanco)
     global grid
@@ -324,3 +324,4 @@ dpg.show_viewport()
 dpg.set_primary_window("Primary Window", True)
 dpg.start_dearpygui()
 dpg.destroy_context()
+
