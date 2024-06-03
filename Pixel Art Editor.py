@@ -286,6 +286,16 @@ def Rotarizquierda():
     grid = nueva_grid
     DibujaGrid()
 
+def InvertirVertical():
+    global grid
+    grid = grid[::-1]
+    DibujaGrid()
+
+def InvertirHorizontal():
+    global grid
+    grid = [fila[::-1] for fila in grid]
+    DibujaGrid()
+
 dpg.create_context()
 
 with dpg.font_registry(): #Fuente para el editor 
@@ -314,6 +324,8 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="X", callback=BorraImagen).CrearBoton()
             Boton(label="Rotar a la derecha", callback=Rotarderecha, width=140).CrearBoton()
             Boton(label="Rotar a la izquierda", callback=Rotarizquierda, width=140).CrearBoton()
+            Boton(label="Invertir vertical", callback=InvertirVertical, width=140).CrearBoton()
+            Boton(label="Invertir horizontal", callback=InvertirHorizontal, width=140).CrearBoton()
             dpg.bind_font(FuentePorDefecto)
             
 DibujaGrid()
