@@ -47,13 +47,19 @@ class Matriz:
     def __init__(self, width, height, default_value=0):
         self.width = width
         self.height = height
-        self.grid = [[default_value for _ in range(width)] for _ in range(height)]
+        self.grid = [[default_value for c in range(width)] for c in range(height)]
         self.cell_size = CELL_SIZE
 
     @classmethod
     def LeerTXT(cls, filepath, width=WIDTH, height=HEIGHT, default_value=0):
-        with open(filepath, 'r') as file:
-            lines = file.readlines()
+        try:
+            print(f"Attempting to open file at: {filepath}")
+            with open(filepath, 'r') as file:
+                lines = file.readlines()
+        except Exception as e:
+            print(f"Error opening file: {e}")
+            return None
+
         matriz = cls(width, height, default_value)
         for y, line in enumerate(lines):
             values = list(map(int, line.split()))
@@ -65,6 +71,18 @@ class Matriz:
     def ConvertirAGrid(self, colores_dict):
         return [[colores_dict.get(val, colores_dict[0]).ObtenerRGB() for val in fila] for fila in self.grid]
 
+    def ImportarImagen(self, sender, app_data, user_data):
+        DirectorioPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
+        if os.path.exists(DirectorioPath):
+            MatrizImportada = Matriz.LeerTXT(DirectorioPath, width=self.width, height=self.height)
+            if MatrizImportada:
+                self.grid = MatrizImportada.ConvertirAGrid(ValoresColores)
+                self.DibujaGrid()
+            else:
+                print(f"Failed to import matrix from {DirectorioPath}")
+        else:
+            print(f"No se encontró el archivo {DirectorioPath}")
+            
     def DibujaGrid(self):
         dpg.delete_item("Dibujo", children_only=True)
         for y in range(self.height):
@@ -125,17 +143,17 @@ class Matriz:
         pixel_data = np.array(grid_expandido, dtype=np.uint8)
         imagen = Image.fromarray(pixel_data)
         folder = os.path.dirname(os.path.abspath(__file__))
-        directorio_path = os.path.join(folder, "PixelArt.png")
-        txt_path = os.path.join(folder, "PixelArt.txt")
+        DirectorioPath = os.path.join(folder, "PixelArt.png")
+        TXTPath = os.path.join(folder, "PixelArt.txt")
         
-        imagen.save(directorio_path)
-        print(f"Imagen guardada en el directorio: {directorio_path}")
+        imagen.save(DirectorioPath)
+        print(f"Imagen guardada en el directorio: {DirectorioPath}")
 
         matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)]
-        with open(txt_path, 'w') as file:
+        with open(TXTPath, 'w') as file:
             for fila in matriz:
                 file.write(" ".join(map(str, fila)) + "\n")
-        print(f"Matriz guardada en el directorio: {txt_path}")
+        print(f"Matriz guardada en el directorio: TXTPath")
 
     def Altocontraste(self):
         for y in range(self.height):
@@ -249,7 +267,7 @@ DiccionarioASCII = {
 ColorActual = Colores["Negro"]
 
 # Inicialización de la matriz
-grid = [[Colores["Borrador"].ObtenerRGB() for _ in range(WIDTH)] for _ in range(HEIGHT)]
+grid = [[Colores["Borrador"].ObtenerRGB() for r in range(WIDTH)] for r in range(HEIGHT)]
 matriz = Matriz(WIDTH, HEIGHT, default_value=Colores["Borrador"].ObtenerRGB())
 matriz.grid = grid
 
@@ -285,6 +303,7 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="Rotar a la izquierda", callback=matriz.Rotarizquierda, width=140).CrearBoton()
             Boton(label="Invertir vertical", callback=matriz.InvertirVertical, width=140).CrearBoton()
             Boton(label="Invertir horizontal", callback=matriz.InvertirHorizontal, width=140).CrearBoton()
+            Boton(label="Importar Imagen", callback=matriz.ImportarImagen).CrearBoton()
             dpg.bind_font(FuentePorDefecto)
 
 matriz.DibujaGrid()
