@@ -149,7 +149,7 @@ def ClickPosicion(sender, app_data, user_data): #Funcion para detectar donde se 
     x = int(mouse_pos[0] // CELL_SIZE)
     y = int(mouse_pos[1] // CELL_SIZE)
     if 0 <= x < WIDTH and 0 <= y < HEIGHT: #Verifica si el mouse clickea dentro del grid
-        grid[y+2][x-1] = ColorActual.ObtenerRGB()
+        grid[y][x] = ColorActual.ObtenerRGB()   #se le suma un 2 a Y, y se le resta 1 a X para mejorar la precision a la hora de dibujar
         DibujaGrid()
 
 def CambioAColorElegido(sender, app_data, user_data): #Funcion que cambia el color a colocar segun seleccion del usuario
