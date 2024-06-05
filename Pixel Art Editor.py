@@ -155,7 +155,7 @@ class Matriz:
                 file.write(" ".join(map(str, fila)) + "\n")
         print(f"Matriz guardada en el directorio: TXTPath")
 
-    def Altocontraste(self):
+    def AltoContraste(self):
         for y in range(self.height):
             for x in range(self.width):
                 valor = self.ValoresColorANumero(self.grid[y][x])
@@ -172,24 +172,24 @@ class Matriz:
                 self.grid[y][x] = ValoresColores[9 - valor].ObtenerRGB()
         self.DibujaGrid()
 
-    def Rotarderecha(self):
+    def RotarDerecha(self):
         filas = len(self.grid)
         columnas = len(self.grid[0])
-        nueva_grid = [[None] * filas for _ in range(columnas)]
+        NuevaGrid = [[None] * filas for _ in range(columnas)]
         for i in range(filas):
             for j in range(columnas):
-                nueva_grid[j][filas - 1 - i] = self.grid[i][j]
-        self.grid = nueva_grid
+                NuevaGrid[j][filas - 1 - i] = self.grid[i][j]
+        self.grid = NuevaGrid
         self.DibujaGrid()
 
-    def Rotarizquierda(self):
+    def RotarIzquierda(self):
         filas = len(self.grid)
         columnas = len(self.grid[0])
-        nueva_grid = [[None] * filas for _ in range(columnas)]
+        NuevaGrid = [[None] * filas for _ in range(columnas)]
         for i in range(filas):
             for j in range(columnas):
-                nueva_grid[filas - 1 - j][i] = self.grid[i][j]
-        self.grid = nueva_grid
+                NuevaGrid[filas - 1 - j][i] = self.grid[i][j]
+        self.grid = NuevaGrid
         self.DibujaGrid()
 
     def InvertirVertical(self):
@@ -200,6 +200,12 @@ class Matriz:
         self.grid = [fila[::-1] for fila in self.grid]
         self.DibujaGrid()
 
+    def Limpiar(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                self.grid[y][x] = ValoresColores[0].ObtenerRGB()
+        self.DibujaGrid()
+        
 # Instanciación de colores
 Borrador = Colores("Borrador", 255, 255, 255, 255, 0)
 Plata = Colores("Plata", 192, 192, 192, 255, 1)
@@ -297,13 +303,14 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="Mostrar Matriz", callback=matriz.DibujaMatriz, width=140).CrearBoton()
             Boton(label="Mostrar ASCII", callback=matriz.DibujaASCII, width=140).CrearBoton()
             Boton(label="Guardar Imagen", callback=matriz.GuardaImagen, width=140).CrearBoton()
-            Boton(label="Alto contraste", callback=matriz.Altocontraste, width=140).CrearBoton()
+            Boton(label="Alto contraste", callback=matriz.AltoContraste, width=140).CrearBoton()
             Boton(label="Negativo", callback=matriz.Negativo, width=140).CrearBoton()
-            Boton(label="Rotar a la derecha", callback=matriz.Rotarderecha, width=140).CrearBoton()
-            Boton(label="Rotar a la izquierda", callback=matriz.Rotarizquierda, width=140).CrearBoton()
+            Boton(label="Rotar a la derecha", callback=matriz.RotarDerecha, width=140).CrearBoton()
+            Boton(label="Rotar a la izquierda", callback=matriz.RotarIzquierda, width=140).CrearBoton()
             Boton(label="Invertir vertical", callback=matriz.InvertirVertical, width=140).CrearBoton()
             Boton(label="Invertir horizontal", callback=matriz.InvertirHorizontal, width=140).CrearBoton()
             Boton(label="Importar Imagen", callback=matriz.ImportarImagen).CrearBoton()
+            Boton(label="Limpiar canva", callback=matriz.Limpiar).CrearBoton()
             dpg.bind_font(FuentePorDefecto)
 
 matriz.DibujaGrid()
