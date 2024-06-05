@@ -4,26 +4,28 @@ from PIL import Image
 import os
 
 # Constantes
-WIDTH, HEIGHT = 50, 50
-CELL_SIZE = 10
-MIN_CELL_SIZE = 5
-MAX_CELL_SIZE = 20
+WIDTH, HEIGHT = 50, 50 #Cantidad de celdas del grid
+CELL_SIZE = 10 #Tamano de cada celda del grid
+MIN_CELL_SIZE = 5 #Tamano minimo de cada celda (Para el ZoomOut)
+MAX_CELL_SIZE = 20 #Tamano maximo de cada celda (Para el ZoomIn)
 
-class Colores:
+#CLase que modela los colores a utilizar, con su espectro RGBA, y asocia cada color con valores (0-255) y numeros (0-9)
+class Colores: 
     def __init__(self, color, R, G, B, a, num):
-        self.color = color
-        self.r = R
+        self.color = color #Nombre del color
+        self.r = R #Valor de cada tonalidad (24 bits, RGB)
         self.g = G
         self.b = B
-        self.a = a
+        self.a = a #Alpha, ergo, la opacidad
         self.num = num
 
     def ObtenerRGB(self):
-        return (self.r, self.g, self.b, self.a)
+        return (self.r, self.g, self.b, self.a) #Brinda los valores de cada color
 
-    def ObtenerNum(self):
+    def ObtenerNum(self): #Brinda el numero asociado a cada colore
         return self.num
 
+#Esta es una clase ASCII que ayuda como base para representar en ASCII la matriz, por medio de la funcion MostrarASCII
 class ASCII:
     def __init__(self, numero, simbolo):
         self.numero = numero
@@ -32,6 +34,7 @@ class ASCII:
     def ObtenerSimbolo(self):
         return self.simbolo
 
+#Esta es una clase que modela los botones interactuables por el usuario
 class Boton:
     def __init__(self, label, callback, user_data=None, width=100, height=30):
         self.label = label
@@ -42,7 +45,7 @@ class Boton:
 
     def CrearBoton(self):
         dpg.add_button(label=self.label, callback=self.callback, user_data=self.user_data, width=self.width, height=self.height)
-        
+#Clase principal        
 class Matriz:
     def __init__(self, width, height, default_value=0):
         self.width = width
@@ -50,17 +53,17 @@ class Matriz:
         self.grid = [[default_value for c in range(width)] for c in range(height)]
         self.cell_size = CELL_SIZE
 
-    @classmethod
-    def LeerTXT(cls, filepath, width=WIDTH, height=HEIGHT, default_value=0):
+    @classmethod #Convierte una funcion a metodo de una clase
+    def LeerTXT(cls, filepath, width=WIDTH, height=HEIGHT, default_value=0): #Funcion para leer el contenido del txt a importar
         try:
             print(f"Attempting to open file at: {filepath}")
             with open(filepath, 'r') as file:
                 lines = file.readlines()
-        except Exception as e:
+        except Exception as e: #Printea en caso de error
             print(f"Error opening file: {e}")
             return None
 
-        matriz = cls(width, height, default_value)
+        matriz = cls(width, height, default_value) #Convierte a matriz el contenido del txt
         for y, line in enumerate(lines):
             values = list(map(int, line.split()))
             for x, value in enumerate(values):
@@ -68,10 +71,10 @@ class Matriz:
                     matriz.grid[y][x] = value
         return matriz
 
-    def ConvertirAGrid(self, colores_dict):
-        return [[colores_dict.get(val, colores_dict[0]).ObtenerRGB() for val in fila] for fila in self.grid]
+    def ConvertirAGrid(self, DiccionarioColores):
+        return [[DiccionarioColores.get(val, DiccionarioColores[0]).ObtenerRGB() for val in fila] for fila in self.grid]
 
-    def ImportarImagen(self, sender, app_data, user_data):
+    def ImportarImagen(self, sender, app_data, user_data): #Funcion que busca el txt llamado "matriz.txt", llama a LeerTXT, y utiliza la nueva matriz para importarla al grid
         DirectorioPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
         if os.path.exists(DirectorioPath):
             MatrizImportada = Matriz.LeerTXT(DirectorioPath, width=self.width, height=self.height)
@@ -83,7 +86,7 @@ class Matriz:
         else:
             print(f"No se encontró el archivo {DirectorioPath}")
             
-    def DibujaGrid(self):
+    def DibujaGrid(self): #Dibuja la matriz sobre la que se hara el pixel art, con MxN = Altura*Ancho
         dpg.delete_item("Dibujo", children_only=True)
         for y in range(self.height):
             for x in range(self.width):
@@ -95,10 +98,10 @@ class Matriz:
         for y in range(self.height + 1):
             dpg.draw_line([0, y * self.cell_size], [self.width * self.cell_size, y * self.cell_size], color=(0, 0, 0, 255), thickness=1, parent="Dibujo")
 
-    def MouseDragHandler(self,sender, app_data):
+    def MouseDragHandler(self,sender, app_data): #Funcion que permite realizar dibujos fluidos, sin tener que clickear pixel por pixel
         self.ClickPosicion(sender, app_data, None)
         
-    def ClickPosicion(self, sender, app_data, user_data):
+    def ClickPosicion(self, sender, app_data, user_data): #Funcion que detecta el punto en que se esta clickeando
         mouse_pos = dpg.get_mouse_pos()
         x = int(mouse_pos[0] // self.cell_size)
         y = int(mouse_pos[1] // self.cell_size)
@@ -106,7 +109,7 @@ class Matriz:
             self.grid[y][x] = ColorActual.ObtenerRGB()
             self.DibujaGrid()
 
-    def ValoresColorANumero(self, rgb): 
+    def ValoresColorANumero(self, rgb): #Funcion de ayuda para el DibujaMatriz, convierte los colores a su numero asignado
         for num, color in ValoresColores.items():
             if color.ObtenerRGB() == rgb:
                 return num
