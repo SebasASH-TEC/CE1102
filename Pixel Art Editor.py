@@ -46,6 +46,7 @@ class Boton:
 
     def CrearBoton(self):
         dpg.add_button(label=self.label, callback=self.callback, user_data=self.user_data, width=self.width, height=self.height)
+
 #Clase principal        
 class Matriz:
     def __init__(self, width, height, default_value=0):
@@ -75,18 +76,20 @@ class Matriz:
     def ConvertirAGrid(self, DiccionarioColores):
         return [[DiccionarioColores.get(val, DiccionarioColores[0]).ObtenerRGB() for val in fila] for fila in self.grid]
 
-    def ImportarImagen(self, sender, app_data, user_data): #Funcion que busca el txt llamado "matriz.txt", llama a LeerTXT, y utiliza la nueva matriz para importarla al grid
-        DirectorioPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
-        if os.path.exists(DirectorioPath):
-            MatrizImportada = Matriz.LeerTXT(DirectorioPath, width=self.width, height=self.height)
+    def ImportarImagen(self, filepath): #Funcion que importa el contenido de un archivo txt
+        if os.path.exists(filepath):
+            MatrizImportada = Matriz.LeerTXT(filepath, width=self.width, height=self.height)
             if MatrizImportada:
                 self.grid = MatrizImportada.ConvertirAGrid(ValoresColores)
                 self.DibujaGrid()
             else:
-                print(f"Failed to import matrix from {DirectorioPath}")
+                print(f"Failed to import matrix from {filepath}")
         else:
-            print(f"No se encontró el archivo {DirectorioPath}")
+            print(f"No se encontró el archivo {filepath}")
             
+    def ImportarImagenConNombre(self, sender, app_data, user_data): #Función para mostrar el popup y obtener el nombre del archivo
+        dpg.show_item("PopupNombreArchivo")
+
     def DibujaGrid(self): #Dibuja la matriz sobre la que se hara el pixel art, con MxN = Altura*Ancho
         dpg.delete_item("Dibujo", children_only=True)
         for y in range(self.height):
@@ -297,6 +300,7 @@ DiccionarioASCII = {
     8: Porcentaje.ObtenerSimbolo(),
     9: Arroba.ObtenerSimbolo()
 }
+
 def DibujarCirculoCallback(sender, app_data, user_data):
     X = int(dpg.get_value("CirculoX"))
     Y = int(dpg.get_value("CirculoY"))
@@ -309,7 +313,12 @@ def DibujarRectanguloCallback(sender, app_data, user_data):
     Ancho = int(dpg.get_value("Ancho"))
     Alto = int(dpg.get_value("Alto"))
     matriz.DibujaRectangulo(X, Y, Ancho, Alto)
- 
+
+def ImportarImagenCallback(sender, app_data, user_data):
+    filepath = dpg.get_value("NombreArchivo")
+    matriz.ImportarImagen(filepath)
+    dpg.hide_item("PopupNombreArchivo")
+
 # Valores iniciales
 ColorActual = Colores["Negro"]
 
@@ -349,7 +358,6 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="Invertir vertical", callback=matriz.InvertirVertical, width=140).CrearBoton()
             Boton(label="Invertir horizontal", callback=matriz.InvertirHorizontal, width=140).CrearBoton()
             
-            
             dpg.bind_font(FuentePorDefecto)
         with dpg.group():
             Boton(label="Limpiar canva", callback=matriz.Limpiar, width=140).CrearBoton()
@@ -357,8 +365,13 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="Rectángulo", callback=lambda: dpg.show_item("PopUpValoresRectangulo"), width=140).CrearBoton()
             Boton(label="Alto contraste", callback=matriz.AltoContraste, width=140).CrearBoton()
             Boton(label="Negativo", callback=matriz.Negativo, width=140).CrearBoton()
-            Boton(label="Importar Imagen", callback=matriz.ImportarImagen, width=140).CrearBoton()
+            Boton(label="Importar Imagen", callback=matriz.ImportarImagenConNombre, width=140).CrearBoton()
             Boton(label="Guardar Imagen", callback=matriz.GuardaImagen, width=140).CrearBoton()
+
+        with dpg.window(label="Nombre del Archivo", modal=True, show=False, tag="PopupNombreArchivo"):
+            dpg.add_input_text(label="Nombre del Archivo", tag="NombreArchivo", default_value="matriz.txt")
+            dpg.add_button(label="Importar", callback=ImportarImagenCallback)
+            dpg.add_button(label="Cancelar", callback=lambda: dpg.hide_item("PopupNombreArchivo"))
 
         with dpg.window(label="Dimensiones", modal=True, show=False, tag="PopUpValoresCirculo"):
             dpg.add_input_int(label="X", tag="CirculoX", default_value=25)
