@@ -117,8 +117,13 @@ class Matriz:
 
     def DibujaMatriz(self):
         matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)]
-        for fila in matriz:
-            print(" ".join(map(str, fila)))
+        
+        if dpg.does_item_exist("MatrizDisplayWindow"):
+            dpg.delete_item("MatrizDisplayWindow")
+
+        with dpg.window(label="Matrix Display", tag="MatrizDisplayWindow", width=400, height=400):
+            for fila in matriz:
+                dpg.add_text(" ".join(map(str, fila)))
 
     def DibujaASCII(self):
         matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)]
