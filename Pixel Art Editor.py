@@ -105,7 +105,7 @@ class Matriz:
         self.ClickPosicion(sender, app_data, None)
         
     def ClickPosicion(self, sender, app_data, user_data): #Funcion que detecta el punto en que se esta clickeando
-        mouse_pos = dpg.get_mouse_pos()
+        mouse_pos = dpg.get_mouse_pos() #Función de dpg que regresa una tupla con la posición en "x" y "y" del mouse
         x = int(mouse_pos[0] // self.cell_size) #Posicion relativa al cell size
         y = int(mouse_pos[1] // self.cell_size)
         if 0 <= x < self.width and 0 <= y < self.height: #Verifica que este dentro de las dimensiones de la ventana 
@@ -129,7 +129,7 @@ class Matriz:
                 dpg.add_text(" ".join(map(str, fila)))
 
     def DibujaASCII(self): #Identica a DibujaMatriz, pero con el diccionario ASCII
-        matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)]
+        matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)] #convierte cada elemento del grid en un número asignado al color correspondiente
         if dpg.does_item_exist("ASCIIWindow"):
             dpg.delete_item("ASCIIWindow")
             
@@ -193,7 +193,7 @@ class Matriz:
         NuevaGrid = [[None] * filas for _ in range(columnas)]
         for i in range(filas):
             for j in range(columnas):
-                NuevaGrid[j][filas - 1 - i] = self.grid[i][j]
+                NuevaGrid[j][filas - 1 - i] = self.grid[i][j]  # toma el elemento en la posición [i][j] de la matriz original y lo coloca en la posición [j][filas - 1 - i] en la nueva matriz, rota la matriz 90 grados hacia la derecha.
         self.grid = NuevaGrid
         self.DibujaGrid()
 
@@ -203,7 +203,7 @@ class Matriz:
         NuevaGrid = [[None] * filas for _ in range(columnas)]
         for i in range(filas):
             for j in range(columnas):
-                NuevaGrid[filas - 1 - j][i] = self.grid[i][j]
+                NuevaGrid[filas - 1 - j][i] = self.grid[i][j] #rota 90 grados la matriz hacia la izquierda
         self.grid = NuevaGrid
         self.DibujaGrid()
 
