@@ -65,11 +65,11 @@ class Matriz:
             return None
 
         matriz = cls(width, height, default_value) #Convierte a matriz el contenido del txt
-        for y, line in enumerate(lines):
-            values = list(map(int, line.split()))
-            for x, value in enumerate(values):
-                if x < width and y < height:
-                    matriz.grid[y][x] = value
+        for y, line in enumerate(lines):            # Itera sobre las líneas leídas del archivo
+            values = list(map(int, line.split()))  # Convierte cada línea en una lista de enteros
+            for x, value in enumerate(values):      # Itera sobre los valores de cada línea
+                if x < width and y < height:        # Asegura que los índices x e y están dentro de los límites de la matriz
+                    matriz.grid[y][x] = value       # Asigna el valor a la posición correspondiente en la matriz
         return matriz
 
     def ConvertirAGrid(self, DiccionarioColores):
@@ -77,9 +77,9 @@ class Matriz:
 
     def ImportarImagen(self, filepath): #Funcion que busca el txt llamado "matriz.txt", llama a LeerTXT, y utiliza la nueva matriz para importarla al grid
         if os.path.exists(filepath):
-            MatrizImportada = Matriz.LeerTXT(filepath, width=self.width, height=self.height)
-            if MatrizImportada:
-                self.grid = MatrizImportada.ConvertirAGrid(ValoresColores)
+            MatrizImportada = Matriz.LeerTXT(filepath, width=self.width, height=self.height) # Si el archivo existe, lee su contenido usando la función LeerTXT y crea una nueva matriz
+            if MatrizImportada:                                   # Verifica si la lectura y creación de la matriz fue exitosa
+                self.grid = MatrizImportada.ConvertirAGrid(ValoresColores)  # Convierte la nueva matriz importada a un grid con colores utilizando el diccionario ValoresColores
                 self.DibujaGrid()
             else:
                 print(f"Failed to import matrix from {filepath}")
@@ -333,18 +333,18 @@ def CambioAColorElegido(sender, app_data, user_data):
 # Dibuja la interfaz
 dpg.create_context()
 
-with dpg.font_registry():
-    FuentePorDefecto = dpg.add_font("Roboto-Light.ttf", 20)
+with dpg.font_registry():                                    #Función para establecer la fuente
+    FuentePorDefecto = dpg.add_font("Roboto-Light.ttf", 20)    #Establece a Roboto-Light como fuente principal
     FuenteSecundaria = dpg.add_font("Roboto-Light.ttf", 10)
 
-with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
-    with dpg.group(horizontal=True):
-        with dpg.group():
-            with dpg.drawlist(width=WIDTH * CELL_SIZE, height=HEIGHT * CELL_SIZE, tag="Dibujo"):
-                dpg.set_item_callback("Dibujo", matriz.ClickPosicion)
+with dpg.window(label="Pixel Art Editor", tag="Primary Window"):   #Función de dpg la cual crea una ventana  a partir de un contexto
+    with dpg.group(horizontal=True):                                # Establece que el grupo de los botones será horizontal
+        with dpg.group():                                           
+            with dpg.drawlist(width=WIDTH * CELL_SIZE, height=HEIGHT * CELL_SIZE, tag="Dibujo"):    #utiliza los valores predeterminados para las dimensiones del lienzo 
+                dpg.set_item_callback("Dibujo", matriz.ClickPosicion)                               #establece cuando el mouse se posicione sobre el lienzo, llame la funcion clickposicion
 
-        with dpg.group():
-            for NombreDeColor in Colores:
+        with dpg.group():                                                                   #se crea el grupo de botones de los colores
+            for NombreDeColor in Colores:                                                   #llama a la instancia Colores para luego llamar a la instancia Botones, para crear los botones con el método CrearBoton
                 Boton(label=NombreDeColor, callback=CambioAColorElegido, user_data=NombreDeColor).CrearBoton()
 
             Boton(label="Zoom In", callback=matriz.ZoomIn).CrearBoton()
@@ -395,6 +395,6 @@ matriz.DibujaGrid()
 dpg.create_viewport(title='Pixel Art Editor', width=900, height=750)
 dpg.setup_dearpygui()
 dpg.show_viewport()
-dpg.set_primary_window("Primary Window", True)
+dpg.set_primary_window("Primary Window", True) #Establece la ventana secundaria que estará dentro de la ventana principal
 dpg.start_dearpygui()
-dpg.destroy_context()
+dpg.destroy_context() #Función de dpg que finaliza la ejecución de la interfaz gráfica
