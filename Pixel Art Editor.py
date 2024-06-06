@@ -226,6 +226,15 @@ class Matriz:
                     self.grid[y][x] = ColorActual.ObtenerRGB()
         self.DibujaGrid()
     
+    def DibujaRectangulo(self, X, Y, Ancho, Alto):
+        for y in range(self.height):
+            for x in range(self.width):
+                if (x == X or x == X + Ancho - 1) and (Y <= y <= Y +Alto - 1):
+                    self.grid[y][x] = ColorActual.ObtenerRGB()
+                if (y == Y or y == Y + Alto - 1) and (X <= x <= X + Ancho - 1):
+                    self.grid[y][x] = ColorActual.ObtenerRGB()
+        self.DibujaGrid()
+    
 # Instanciación de colores
 Borrador = Colores("Borrador", 255, 255, 255, 255, 0)
 Plata = Colores("Plata", 192, 192, 192, 255, 1)
@@ -293,6 +302,13 @@ def DibujarCirculoCallback(sender, app_data, user_data):
     Y = int(dpg.get_value("CirculoY"))
     Radio = int(dpg.get_value("CirculoRadio"))
     matriz.DibujaCirculo(X, Y, Radio)
+
+def DibujarRectanguloCallback(sender, app_data, user_data):
+    X = int(dpg.get_value("RectanguloX"))
+    Y = int(dpg.get_value("RectanguloY"))
+    Ancho = int(dpg.get_value("Ancho"))
+    Alto = int(dpg.get_value("Alto"))
+    matriz.DibujaRectangulo(X, Y, Ancho, Alto)
  
 # Valores iniciales
 ColorActual = Colores["Negro"]
@@ -337,18 +353,27 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             dpg.bind_font(FuentePorDefecto)
         with dpg.group():
             Boton(label="Limpiar canva", callback=matriz.Limpiar, width=140).CrearBoton()
-            Boton(label="Dibujar Círculo", callback=lambda: dpg.show_item("PopUpValoresCirculo"), width=140).CrearBoton()
+            Boton(label="Círculo", callback=lambda: dpg.show_item("PopUpValoresCirculo"), width=140).CrearBoton()
+            Boton(label="Rectángulo", callback=lambda: dpg.show_item("PopUpValoresRectangulo"), width=140).CrearBoton()
             Boton(label="Alto contraste", callback=matriz.AltoContraste, width=140).CrearBoton()
             Boton(label="Negativo", callback=matriz.Negativo, width=140).CrearBoton()
             Boton(label="Importar Imagen", callback=matriz.ImportarImagen, width=140).CrearBoton()
             Boton(label="Guardar Imagen", callback=matriz.GuardaImagen, width=140).CrearBoton()
 
-        with dpg.window(label="Circle Dimensions", modal=True, show=False, tag="PopUpValoresCirculo"):
+        with dpg.window(label="Dimensiones", modal=True, show=False, tag="PopUpValoresCirculo"):
             dpg.add_input_int(label="X", tag="CirculoX", default_value=25)
             dpg.add_input_int(label="Y", tag="CirculoY", default_value=25)
             dpg.add_input_int(label="Radio", tag="CirculoRadio", default_value=10)
             dpg.add_button(label="Dibujar", callback=DibujarCirculoCallback)
             dpg.add_button(label="Cancelar", callback=lambda: dpg.hide_item("PopUpValoresCirculo"))
+        
+        with dpg.window(label="Dimensiones", modal=True, show=False, tag="PopUpValoresRectangulo"):
+            dpg.add_input_int(label="X de origen", tag="RectanguloX", default_value=10)
+            dpg.add_input_int(label="Y de origen", tag="RectanguloY", default_value=10)
+            dpg.add_input_int(label="Ancho", tag="Ancho", default_value=20)
+            dpg.add_input_int(label="Alto", tag="Alto", default_value=15)
+            dpg.add_button(label="Dibujar", callback=DibujarRectanguloCallback)
+            dpg.add_button(label="Cancelar", callback=lambda: dpg.hide_item("PopUpValoresRectangulo"))
 
 matriz.DibujaGrid()
 with dpg.handler_registry():
