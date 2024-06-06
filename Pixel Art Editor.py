@@ -46,7 +46,6 @@ class Boton:
 
     def CrearBoton(self):
         dpg.add_button(label=self.label, callback=self.callback, user_data=self.user_data, width=self.width, height=self.height)
-
 #Clase principal        
 class Matriz:
     def __init__(self, width, height, default_value=0):
@@ -76,29 +75,27 @@ class Matriz:
     def ConvertirAGrid(self, DiccionarioColores):
         return [[DiccionarioColores.get(val, DiccionarioColores[0]).ObtenerRGB() for val in fila] for fila in self.grid]
 
-    def ImportarImagen(self, filepath): #Funcion que importa el contenido de un archivo txt
-        if os.path.exists(filepath):
-            MatrizImportada = Matriz.LeerTXT(filepath, width=self.width, height=self.height)
+    def ImportarImagen(self, sender, app_data, user_data): #Funcion que busca el txt llamado "matriz.txt", llama a LeerTXT, y utiliza la nueva matriz para importarla al grid
+        DirectorioPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
+        if os.path.exists(DirectorioPath):
+            MatrizImportada = Matriz.LeerTXT(DirectorioPath, width=self.width, height=self.height)
             if MatrizImportada:
                 self.grid = MatrizImportada.ConvertirAGrid(ValoresColores)
                 self.DibujaGrid()
             else:
-                print(f"Failed to import matrix from {filepath}")
+                print(f"Failed to import matrix from {DirectorioPath}")
         else:
-            print(f"No se encontró el archivo {filepath}")
+            print(f"No se encontró el archivo {DirectorioPath}")
             
-    def ImportarImagenConNombre(self, sender, app_data, user_data): #Función para mostrar el popup y obtener el nombre del archivo
-        dpg.show_item("PopupNombreArchivo")
-
     def DibujaGrid(self): #Dibuja la matriz sobre la que se hara el pixel art, con MxN = Altura*Ancho
-        dpg.delete_item("Dibujo", children_only=True)
+        dpg.delete_item("Dibujo", children_only=True) #El children only se asegura de solo borrar ventanas secundarias, no la principal
         for y in range(self.height):
-            for x in range(self.width):
+            for x in range(self.width): #For anidados para recorrer la matriz, dibujando las celdas
                 dpg.draw_rectangle([x * self.cell_size, y * self.cell_size],
-                                   [(x + 1) * self.cell_size, (y + 1) * self.cell_size],
-                                   color=(0, 0, 0, 255), fill=self.grid[y][x], parent="Dibujo")
+                                   [(x + 1) * self.cell_size, (y + 1) * self.cell_size], #Dibuja las celdas en del tamano del cell_size
+                                   color=(0, 0, 0, 255), fill=self.grid[y][x], parent="Dibujo") #Color blanco por defecto, y la pone como ventana secundaria del Dibujo
         for x in range(self.width + 1):
-            dpg.draw_line([x * self.cell_size, 0], [x * self.cell_size, self.height * self.cell_size], color=(0, 0, 0, 255), thickness=1, parent="Dibujo")
+            dpg.draw_line([x * self.cell_size, 0], [x * self.cell_size, self.height * self.cell_size], color=(0, 0, 0, 255), thickness=1, parent="Dibujo") #Dibuja las lineas de la matricula
         for y in range(self.height + 1):
             dpg.draw_line([0, y * self.cell_size], [self.width * self.cell_size, y * self.cell_size], color=(0, 0, 0, 255), thickness=1, parent="Dibujo")
 
@@ -107,9 +104,9 @@ class Matriz:
         
     def ClickPosicion(self, sender, app_data, user_data): #Funcion que detecta el punto en que se esta clickeando
         mouse_pos = dpg.get_mouse_pos()
-        x = int(mouse_pos[0] // self.cell_size)
+        x = int(mouse_pos[0] // self.cell_size) #Posicion relativa al cell size
         y = int(mouse_pos[1] // self.cell_size)
-        if 0 <= x < self.width and 0 <= y < self.height:
+        if 0 <= x < self.width and 0 <= y < self.height: #Verifica que este dentro de las dimensiones de la ventana 
             self.grid[y][x] = ColorActual.ObtenerRGB()
             self.DibujaGrid()
 
@@ -122,18 +119,19 @@ class Matriz:
     def DibujaMatriz(self):
         matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)]
         
-        if dpg.does_item_exist("MatrizDisplayWindow"):
-            dpg.delete_item("MatrizDisplayWindow")
+        if dpg.does_item_exist("MatrizWindow"): #Verifica si hay una ventana del mismo nombre, y la destruye
+            dpg.delete_item("MatrizWindow")
 
-        with dpg.window(label="Matriz", tag="MatrizDisplayWindow", width=700, height=600):
+        with dpg.window(label="Matriz", tag="MatrizWindow", width=700, height=600): #Crea la ventana secundaria para desplegar la matriz 
             for fila in matriz:
                 dpg.add_text(" ".join(map(str, fila)))
 
-    def DibujaASCII(self):
+    def DibujaASCII(self): #Identica a DibujaMatriz, pero con el diccionario ASCII
         matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)]
-        if dpg.does_item_exist("ASCIIDisplayWindow"):
-            dpg.delete_item("ASCIIDisplayWindow")
-        with dpg.window(label="ASCII", tag="ASCIIDisplayWindow", width=700, height=600):
+        if dpg.does_item_exist("ASCIIWindow"):
+            dpg.delete_item("ASCIIWindow")
+            
+        with dpg.window(label="ASCII", tag="ASCIIWindow", width=700, height=600):
             for fila in matriz:
                 dpg.add_text("".join(DiccionarioASCII[val] for val in fila))
 
@@ -148,23 +146,23 @@ class Matriz:
             self.DibujaGrid()
 
     def GuardaImagen(self):
-        grid_expandido = []
+        grid_expandido = [] #Lista vacia para guardar la matriz
         for fila in self.grid:
             nueva_fila = []
             for color in fila:
                 nueva_fila.extend([color[:3], color[:3]])
-            grid_expandido.extend([nueva_fila, nueva_fila])
+            grid_expandido.extend([nueva_fila, nueva_fila]) #Duplica cada pixel, para aumentar la resolucion de la imagen resultante
         
-        pixel_data = np.array(grid_expandido, dtype=np.uint8)
-        imagen = Image.fromarray(pixel_data)
-        folder = os.path.dirname(os.path.abspath(__file__))
+        pixel_data = np.array(grid_expandido, dtype=np.uint8) #Convierte el grid en un array de numpy
+        imagen = Image.fromarray(pixel_data) #Utiliza el modulo image para generar la imagen a traves del array
+        folder = os.path.dirname(os.path.abspath(__file__)) #Direccion para guardarla
         DirectorioPath = os.path.join(folder, "PixelArt.png")
         TXTPath = os.path.join(folder, "PixelArt.txt")
         
         imagen.save(DirectorioPath)
         print(f"Imagen guardada en el directorio: {DirectorioPath}")
 
-        matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)]
+        matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)] #Realiza un proceso similar a MostrarMatriz, pero lo escribe en un txt, en lugar de desplegarlo
         with open(TXTPath, 'w') as file:
             for fila in matriz:
                 file.write(" ".join(map(str, fila)) + "\n")
@@ -174,13 +172,13 @@ class Matriz:
         for y in range(self.height):
             for x in range(self.width):
                 valor = self.ValoresColorANumero(self.grid[y][x])
-                if 0 <= valor <= 4:
+                if 0 <= valor <= 4: #Compara los valores actuales, si es igual o menor a 4, se vuelve color 1, si no, se vuelve 9
                     self.grid[y][x] = ValoresColores[1].ObtenerRGB()
                 elif 5 <= valor <= 9:
                     self.grid[y][x] = ValoresColores[9].ObtenerRGB()
         self.DibujaGrid()
 
-    def Negativo(self):
+    def Negativo(self): #Convierte cada valor en su extremo opuesto
         for y in range(self.height):
             for x in range(self.width):
                 valor = self.ValoresColorANumero(self.grid[y][x])
@@ -208,7 +206,7 @@ class Matriz:
         self.DibujaGrid()
 
     def InvertirVertical(self):
-        self.grid = self.grid[::-1]
+        self.grid = self.grid[::-1] #Invierte la lista
         self.DibujaGrid()
 
     def InvertirHorizontal(self):
@@ -218,14 +216,14 @@ class Matriz:
     def Limpiar(self):
         for y in range(self.height):
             for x in range(self.width):
-                self.grid[y][x] = ValoresColores[0].ObtenerRGB()
+                self.grid[y][x] = ValoresColores[0].ObtenerRGB() #Convierte todos los valores a 0
         self.DibujaGrid()
     
-    def DibujaCirculo(self, X, Y, radius):
+    def DibujaCirculo(self, X, Y, Radio):
         for y in range(self.height):
-            for x in range(self.width):
-                distance = math.sqrt((x - X)**2 + (y - Y)**2)
-                if radius - 0.5 <= distance <= radius + 0.5:
+            for x in range(self.width): #Convierte los puntos de la matriz, especificados por el usuario, en el color actual seleccionado
+                Distancia = math.sqrt((x - X)**2 + (y - Y)**2)
+                if Radio - 0.5 <= Distancia <=Radio + 0.5:
                     self.grid[y][x] = ColorActual.ObtenerRGB()
         self.DibujaGrid()
     
@@ -300,7 +298,6 @@ DiccionarioASCII = {
     8: Porcentaje.ObtenerSimbolo(),
     9: Arroba.ObtenerSimbolo()
 }
-
 def DibujarCirculoCallback(sender, app_data, user_data):
     X = int(dpg.get_value("CirculoX"))
     Y = int(dpg.get_value("CirculoY"))
@@ -313,12 +310,7 @@ def DibujarRectanguloCallback(sender, app_data, user_data):
     Ancho = int(dpg.get_value("Ancho"))
     Alto = int(dpg.get_value("Alto"))
     matriz.DibujaRectangulo(X, Y, Ancho, Alto)
-
-def ImportarImagenCallback(sender, app_data, user_data):
-    filepath = dpg.get_value("NombreArchivo")
-    matriz.ImportarImagen(filepath)
-    dpg.hide_item("PopupNombreArchivo")
-
+ 
 # Valores iniciales
 ColorActual = Colores["Negro"]
 
@@ -358,6 +350,7 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="Invertir vertical", callback=matriz.InvertirVertical, width=140).CrearBoton()
             Boton(label="Invertir horizontal", callback=matriz.InvertirHorizontal, width=140).CrearBoton()
             
+            
             dpg.bind_font(FuentePorDefecto)
         with dpg.group():
             Boton(label="Limpiar canva", callback=matriz.Limpiar, width=140).CrearBoton()
@@ -365,13 +358,8 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="Rectángulo", callback=lambda: dpg.show_item("PopUpValoresRectangulo"), width=140).CrearBoton()
             Boton(label="Alto contraste", callback=matriz.AltoContraste, width=140).CrearBoton()
             Boton(label="Negativo", callback=matriz.Negativo, width=140).CrearBoton()
-            Boton(label="Importar Imagen", callback=matriz.ImportarImagenConNombre, width=140).CrearBoton()
+            Boton(label="Importar Imagen", callback=matriz.ImportarImagen, width=140).CrearBoton()
             Boton(label="Guardar Imagen", callback=matriz.GuardaImagen, width=140).CrearBoton()
-
-        with dpg.window(label="Nombre del Archivo", modal=True, show=False, tag="PopupNombreArchivo"):
-            dpg.add_input_text(label="Nombre del Archivo", tag="NombreArchivo", default_value="matriz.txt")
-            dpg.add_button(label="Importar", callback=ImportarImagenCallback)
-            dpg.add_button(label="Cancelar", callback=lambda: dpg.hide_item("PopupNombreArchivo"))
 
         with dpg.window(label="Dimensiones", modal=True, show=False, tag="PopUpValoresCirculo"):
             dpg.add_input_int(label="X", tag="CirculoX", default_value=25)
@@ -388,10 +376,10 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             dpg.add_button(label="Dibujar", callback=DibujarRectanguloCallback)
             dpg.add_button(label="Cancelar", callback=lambda: dpg.hide_item("PopUpValoresRectangulo"))
 
-matriz.DibujaGrid()
 with dpg.handler_registry():
     dpg.add_mouse_drag_handler(callback=matriz.MouseDragHandler) #función de dpg que captura el click del mouse
 
+matriz.DibujaGrid()
 dpg.create_viewport(title='Pixel Art Editor', width=800, height=800)
 dpg.setup_dearpygui()
 dpg.show_viewport()
