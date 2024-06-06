@@ -122,14 +122,17 @@ class Matriz:
         if dpg.does_item_exist("MatrizDisplayWindow"):
             dpg.delete_item("MatrizDisplayWindow")
 
-        with dpg.window(label="Matrix Display", tag="MatrizDisplayWindow", width=400, height=400):
+        with dpg.window(label="Matriz", tag="MatrizDisplayWindow", width=700, height=600):
             for fila in matriz:
                 dpg.add_text(" ".join(map(str, fila)))
 
     def DibujaASCII(self):
         matriz = [[self.ValoresColorANumero(self.grid[y][x]) for x in range(self.width)] for y in range(self.height)]
-        for fila in matriz:
-            print("".join(DiccionarioASCII[val] for val in fila))
+        if dpg.does_item_exist("ASCIIDisplayWindow"):
+            dpg.delete_item("ASCIIDisplayWindow")
+        with dpg.window(label="ASCII", tag="ASCIIDisplayWindow", width=700, height=600):
+            for fila in matriz:
+                dpg.add_text("".join(DiccionarioASCII[val] for val in fila))
 
     def ZoomIn(self):
         if self.cell_size < MAX_CELL_SIZE:
@@ -324,18 +327,21 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="Zoom Out", callback=matriz.ZoomOut).CrearBoton()
             Boton(label="Mostrar Matriz", callback=matriz.DibujaMatriz, width=140).CrearBoton()
             Boton(label="Mostrar ASCII", callback=matriz.DibujaASCII, width=140).CrearBoton()
-            Boton(label="Guardar Imagen", callback=matriz.GuardaImagen, width=140).CrearBoton()
-            Boton(label="Alto contraste", callback=matriz.AltoContraste, width=140).CrearBoton()
-            Boton(label="Negativo", callback=matriz.Negativo, width=140).CrearBoton()
-            Boton(label="Rotar a la derecha", callback=matriz.RotarDerecha, width=140).CrearBoton()
-            Boton(label="Rotar a la izquierda", callback=matriz.RotarIzquierda, width=140).CrearBoton()
+            
+            Boton(label="Rotar a la derecha", callback=matriz.RotarDerecha, width=150).CrearBoton()
+            Boton(label="Rotar a la izquierda", callback=matriz.RotarIzquierda, width=150).CrearBoton()
             Boton(label="Invertir vertical", callback=matriz.InvertirVertical, width=140).CrearBoton()
             Boton(label="Invertir horizontal", callback=matriz.InvertirHorizontal, width=140).CrearBoton()
-            Boton(label="Importar Imagen", callback=matriz.ImportarImagen).CrearBoton()
-            Boton(label="Limpiar canva", callback=matriz.Limpiar).CrearBoton()
+            
+            
             dpg.bind_font(FuentePorDefecto)
         with dpg.group():
-            Boton(label="Dibujar Círculo", callback=lambda: dpg.show_item("PopUpValoresCirculo")).CrearBoton()
+            Boton(label="Limpiar canva", callback=matriz.Limpiar, width=140).CrearBoton()
+            Boton(label="Dibujar Círculo", callback=lambda: dpg.show_item("PopUpValoresCirculo"), width=140).CrearBoton()
+            Boton(label="Alto contraste", callback=matriz.AltoContraste, width=140).CrearBoton()
+            Boton(label="Negativo", callback=matriz.Negativo, width=140).CrearBoton()
+            Boton(label="Importar Imagen", callback=matriz.ImportarImagen, width=140).CrearBoton()
+            Boton(label="Guardar Imagen", callback=matriz.GuardaImagen, width=140).CrearBoton()
 
         with dpg.window(label="Circle Dimensions", modal=True, show=False, tag="PopUpValoresCirculo"):
             dpg.add_input_int(label="X", tag="CirculoX", default_value=25)
