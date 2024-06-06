@@ -75,17 +75,19 @@ class Matriz:
     def ConvertirAGrid(self, DiccionarioColores):
         return [[DiccionarioColores.get(val, DiccionarioColores[0]).ObtenerRGB() for val in fila] for fila in self.grid]
 
-    def ImportarImagen(self, sender, app_data, user_data): #Funcion que busca el txt llamado "matriz.txt", llama a LeerTXT, y utiliza la nueva matriz para importarla al grid
-        DirectorioPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matriz.txt')
-        if os.path.exists(DirectorioPath):
-            MatrizImportada = Matriz.LeerTXT(DirectorioPath, width=self.width, height=self.height)
+    def ImportarImagen(self, filepath): #Funcion que busca el txt llamado "matriz.txt", llama a LeerTXT, y utiliza la nueva matriz para importarla al grid
+        if os.path.exists(filepath):
+            MatrizImportada = Matriz.LeerTXT(filepath, width=self.width, height=self.height)
             if MatrizImportada:
                 self.grid = MatrizImportada.ConvertirAGrid(ValoresColores)
                 self.DibujaGrid()
             else:
-                print(f"Failed to import matrix from {DirectorioPath}")
+                print(f"Failed to import matrix from {filepath}")
         else:
-            print(f"No se encontró el archivo {DirectorioPath}")
+            print(f"No se encontró el archivo {filepath}")
+    
+    def ImportarImagenConNombre(self, sender, app_data, user_data): #Función para mostrar el popup y obtener el nombre del archivo
+        dpg.show_item("PopupNombreArchivo")
             
     def DibujaGrid(self): #Dibuja la matriz sobre la que se hara el pixel art, con MxN = Altura*Ancho
         dpg.delete_item("Dibujo", children_only=True) #El children only se asegura de solo borrar ventanas secundarias, no la principal
@@ -310,7 +312,12 @@ def DibujarRectanguloCallback(sender, app_data, user_data):
     Ancho = int(dpg.get_value("Ancho"))
     Alto = int(dpg.get_value("Alto"))
     matriz.DibujaRectangulo(X, Y, Ancho, Alto)
- 
+
+def ImportarImagenCallback(sender, app_data, user_data):
+    path = dpg.get_value("NombreArchivo")
+    matriz.ImportarImagen(path)
+    dpg.hide_item("PopupNombreArchivo")
+    
 # Valores iniciales
 ColorActual = Colores["Negro"]
 
@@ -358,8 +365,13 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="Rectángulo", callback=lambda: dpg.show_item("PopUpValoresRectangulo"), width=140).CrearBoton()
             Boton(label="Alto contraste", callback=matriz.AltoContraste, width=140).CrearBoton()
             Boton(label="Negativo", callback=matriz.Negativo, width=140).CrearBoton()
-            Boton(label="Importar Imagen", callback=matriz.ImportarImagen, width=140).CrearBoton()
+            Boton(label="Importar Imagen", callback=matriz.ImportarImagenConNombre, width=140).CrearBoton()
             Boton(label="Guardar Imagen", callback=matriz.GuardaImagen, width=140).CrearBoton()
+        
+        with dpg.window(label="Nombre del Archivo", modal=True, show=False, tag="PopupNombreArchivo"):
+            dpg.add_input_text(label="Nombre del Archivo", tag="NombreArchivo", default_value="matriz.txt")
+            dpg.add_button(label="Importar", callback=ImportarImagenCallback)
+            dpg.add_button(label="Cancelar", callback=lambda: dpg.hide_item("PopupNombreArchivo"))
 
         with dpg.window(label="Dimensiones", modal=True, show=False, tag="PopUpValoresCirculo"):
             dpg.add_input_int(label="X", tag="CirculoX", default_value=25)
@@ -380,7 +392,7 @@ with dpg.handler_registry():
     dpg.add_mouse_drag_handler(callback=matriz.MouseDragHandler) #función de dpg que captura el click del mouse
 
 matriz.DibujaGrid()
-dpg.create_viewport(title='Pixel Art Editor', width=800, height=800)
+dpg.create_viewport(title='Pixel Art Editor', width=900, height=750)
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.set_primary_window("Primary Window", True)
