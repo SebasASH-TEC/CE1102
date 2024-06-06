@@ -1,6 +1,7 @@
 import dearpygui.dearpygui as dpg
 import numpy as np
 from PIL import Image
+import math
 import os
 
 # Constantes
@@ -213,7 +214,15 @@ class Matriz:
             for x in range(self.width):
                 self.grid[y][x] = ValoresColores[0].ObtenerRGB()
         self.DibujaGrid()
-        
+    
+    def DibujaCirculo(self, X, Y, radius):
+        for y in range(self.height):
+            for x in range(self.width):
+                distance = math.sqrt((x - X)**2 + (y - Y)**2)
+                if radius - 0.5 <= distance <= radius + 0.5:
+                    self.grid[y][x] = ColorActual.ObtenerRGB()
+        self.DibujaGrid()
+    
 # Instanciación de colores
 Borrador = Colores("Borrador", 255, 255, 255, 255, 0)
 Plata = Colores("Plata", 192, 192, 192, 255, 1)
@@ -276,7 +285,12 @@ DiccionarioASCII = {
     8: Porcentaje.ObtenerSimbolo(),
     9: Arroba.ObtenerSimbolo()
 }
-
+def DibujarCirculoCallback(sender, app_data, user_data):
+    X = int(dpg.get_value("CirculoX"))
+    Y = int(dpg.get_value("CirculoY"))
+    Radio = int(dpg.get_value("CirculoRadio"))
+    matriz.DibujaCirculo(X, Y, Radio)
+ 
 # Valores iniciales
 ColorActual = Colores["Negro"]
 
@@ -320,6 +334,15 @@ with dpg.window(label="Pixel Art Editor", tag="Primary Window"):
             Boton(label="Importar Imagen", callback=matriz.ImportarImagen).CrearBoton()
             Boton(label="Limpiar canva", callback=matriz.Limpiar).CrearBoton()
             dpg.bind_font(FuentePorDefecto)
+        with dpg.group():
+            Boton(label="Dibujar Círculo", callback=lambda: dpg.show_item("PopUpValoresCirculo")).CrearBoton()
+
+        with dpg.window(label="Circle Dimensions", modal=True, show=False, tag="PopUpValoresCirculo"):
+            dpg.add_input_int(label="X", tag="CirculoX", default_value=25)
+            dpg.add_input_int(label="Y", tag="CirculoY", default_value=25)
+            dpg.add_input_int(label="Radio", tag="CirculoRadio", default_value=10)
+            dpg.add_button(label="Dibujar", callback=DibujarCirculoCallback)
+            dpg.add_button(label="Cancelar", callback=lambda: dpg.hide_item("PopUpValoresCirculo"))
 
 matriz.DibujaGrid()
 with dpg.handler_registry():
